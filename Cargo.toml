@@ -1,0 +1,14 @@
+[package]
+name = "resman"
+version = "0.1.0"
+authors = ["Azriel Hoh <azriel91@gmail.com>"]
+edition = "2018"
+description = "Runtime managed resource borrowing."
+repository = "https://github.com/azriel91/resman"
+documentation = "https://docs.rs/resman/"
+readme = "README.md"
+keywords = ["data", "share", "lock"]
+license = "MIT OR Apache-2.0"
+
+[dependencies]
+downcast-rs = "1.2.0"
