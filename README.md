@@ -1,5 +1,9 @@
 # 🗂️ resman
 
+[![Crates.io](https://img.shields.io/crates/v/resman.svg)](https://crates.io/crates/resman)
+![CI](https://github.com/azriel91/resman/workflows/CI/badge.svg)
+[![Coverage Status](https://codecov.io/gh/azriel91/resman/branch/main/graph/badge.svg)](https://codecov.io/gh/azriel91/resman)
+
 Runtime managed resource borrowing.
 
 This library provides a map that can store one of any type, as well as mutable borrows to each type at the same time.
