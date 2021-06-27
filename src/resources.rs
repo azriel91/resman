@@ -1,25 +1,12 @@
-use std::{any::TypeId, collections::HashMap, marker::PhantomData};
+use std::any::TypeId;
 
-use crate::{Cell, CellRef, Entry, Ref, RefMut, Resource};
+use rt_map::{Cell, Entry, RtMap};
+
+use crate::{Ref, RefMut, Resource};
 
 /// Map from `TypeId` to type.
 #[derive(Default)]
-pub struct Resources(HashMap<TypeId, Cell<Box<dyn Resource>>>);
-
-macro_rules! fetch_panic {
-    () => {
-        panic!(
-            "\
-            Tried to fetch resource from the resources map, but the resource does not exist.\n\
-            \n\
-            Resource: `{resource_name_full}`\n\
-            \n\
-            You may ensure the resource exists!\
-            ",
-            resource_name_full = std::any::type_name::<R>(),
-        )
-    };
-}
+pub struct Resources(RtMap<TypeId, Box<dyn Resource>>);
 
 /// A [Resource] container, which provides methods to insert, access and manage
 /// the contained resources.
@@ -34,11 +21,11 @@ macro_rules! fetch_panic {
 /// Resources are identified by `TypeId`s, which consist of a `TypeId`.
 impl Resources {
     /// Returns an entry for the resource with type `R`.
-    pub fn entry<R>(&mut self) -> Entry<R>
+    pub fn entry<R>(&mut self) -> Entry<TypeId, Box<dyn Resource>>
     where
         R: Resource,
     {
-        Entry::new(self.0.entry(TypeId::of::<R>()))
+        self.0.entry(TypeId::of::<R>())
     }
 
     /// Inserts a resource into this container. If the resource existed before,
@@ -67,7 +54,7 @@ impl Resources {
     where
         R: Resource,
     {
-        self.0.insert(TypeId::of::<R>(), Cell::new(Box::new(r)));
+        self.0.insert(TypeId::of::<R>(), Box::new(r));
     }
 
     /// Removes a resource of type `R` from this container and returns its
@@ -84,7 +71,6 @@ impl Resources {
     {
         self.0
             .remove(&TypeId::of::<R>())
-            .map(Cell::into_inner)
             .map(|x: Box<dyn Resource>| x.downcast())
             .map(|x: Result<Box<R>, _>| x.ok().unwrap())
             .map(|x| *x)
@@ -112,13 +98,7 @@ impl Resources {
     where
         R: Resource,
     {
-        self.0
-            .get(&TypeId::of::<R>())
-            .map(|r| Ref {
-                inner: CellRef::map(r.borrow(), Box::as_ref),
-                phantom: PhantomData,
-            })
-            .unwrap_or_else(|| fetch_panic!())
+        Ref::new(self.0.borrow(&TypeId::of::<R>()))
     }
 
     /// Returns an immutable reference to `R` if it exists, `None` otherwise.
@@ -126,12 +106,7 @@ impl Resources {
     where
         R: Resource,
     {
-        self.0.get(&TypeId::of::<R>()).and_then(|r_cell| {
-            r_cell.try_borrow().map(|r| Ref {
-                inner: CellRef::map(r, Box::as_ref),
-                phantom: PhantomData,
-            })
-        })
+        self.0.try_borrow(&TypeId::of::<R>()).map(Ref::new)
     }
 
     /// Returns a mutable reference to `R` if it exists, `None` otherwise.
@@ -144,13 +119,7 @@ impl Resources {
     where
         R: Resource,
     {
-        self.0
-            .get(&TypeId::of::<R>())
-            .map(|r| RefMut {
-                inner: r.borrow_mut().map(Box::as_mut),
-                phantom: PhantomData,
-            })
-            .unwrap_or_else(|| fetch_panic!())
+        RefMut::new(self.0.borrow_mut(&TypeId::of::<R>()))
     }
 
     /// Returns a mutable reference to `R` if it exists, `None` otherwise.
@@ -158,12 +127,7 @@ impl Resources {
     where
         R: Resource,
     {
-        self.0.get(&TypeId::of::<R>()).and_then(|r_cell| {
-            r_cell.try_borrow_mut().map(|ref_cell_mut| RefMut {
-                inner: ref_cell_mut.map(Box::as_mut),
-                phantom: PhantomData,
-            })
-        })
+        self.0.try_borrow_mut(&TypeId::of::<R>()).map(RefMut::new)
     }
 
     /// Retrieves a resource without fetching, which is cheaper, but only
@@ -176,21 +140,20 @@ impl Resources {
     /// Retrieves a resource without fetching, which is cheaper, but only
     /// available with `&mut self`.
     pub fn get_resource_mut(&mut self, id: TypeId) -> Option<&mut dyn Resource> {
-        self.0.get_mut(&id).map(Cell::get_mut).map(Box::as_mut)
+        self.0.get_resource_mut(&id).map(|resource| &mut **resource)
     }
 
     /// Get raw access to the underlying cell.
     pub fn get_raw(&self, id: &TypeId) -> Option<&Cell<Box<dyn Resource>>> {
-        self.0.get(id)
+        self.0.get_raw(id)
     }
 }
 
 #[cfg(test)]
 mod tests {
-    use super::Resources;
+    use std::any::TypeId;
 
-    #[derive(Debug, Default, PartialEq)]
-    struct Res;
+    use super::Resources;
 
     #[test]
     fn insert() {
@@ -268,4 +231,33 @@ mod tests {
 
         assert_eq!(None, resources.try_borrow_mut::<Res>());
     }
+
+    #[test]
+    fn get_mut_returns_some() {
+        let mut resources = Resources::default();
+        resources.insert(Res);
+
+        let _res = resources.get_mut::<Res>();
+
+        assert!(resources.try_borrow_mut::<Res>().is_some());
+    }
+
+    #[test]
+    fn get_resource_mut_returns_some() {
+        let mut resources = Resources::default();
+        resources.insert(Res);
+
+        assert!(resources.get_resource_mut(TypeId::of::<Res>()).is_some());
+    }
+
+    #[test]
+    fn get_raw_returns_some() {
+        let mut resources = Resources::default();
+        resources.insert(Res);
+
+        assert!(resources.get_raw(&TypeId::of::<Res>()).is_some());
+    }
+
+    #[derive(Debug, Default, PartialEq)]
+    struct Res;
 }
