@@ -74,8 +74,11 @@
 //! [`mopa`]: https://github.com/chris-morgan/mopa
 //! [`shred`]: https://github.com/amethyst/shred
 
-pub use crate::{r#ref::Ref, ref_mut::RefMut, resource::Resource, resources::Resources};
+pub use crate::{
+    entry::Entry, r#ref::Ref, ref_mut::RefMut, resource::Resource, resources::Resources,
+};
 
+mod entry;
 mod r#ref;
 mod ref_mut;
 mod resource;

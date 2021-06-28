@@ -1,8 +1,8 @@
 use std::any::TypeId;
 
-use rt_map::{Cell, Entry, RtMap};
+use rt_map::{Cell, RtMap};
 
-use crate::{Ref, RefMut, Resource};
+use crate::{Entry, Ref, RefMut, Resource};
 
 /// Map from `TypeId` to type.
 #[derive(Default)]
@@ -21,11 +21,11 @@ pub struct Resources(RtMap<TypeId, Box<dyn Resource>>);
 /// Resources are identified by `TypeId`s, which consist of a `TypeId`.
 impl Resources {
     /// Returns an entry for the resource with type `R`.
-    pub fn entry<R>(&mut self) -> Entry<TypeId, Box<dyn Resource>>
+    pub fn entry<R>(&mut self) -> Entry<R>
     where
         R: Resource,
     {
-        self.0.entry(TypeId::of::<R>())
+        Entry::new(self.0.entry(TypeId::of::<R>()))
     }
 
     /// Inserts a resource into this container. If the resource existed before,
@@ -154,6 +154,23 @@ mod tests {
     use std::any::TypeId;
 
     use super::Resources;
+
+    #[test]
+    fn entry_or_insert_inserts_value() {
+        #[derive(Debug, PartialEq)]
+        struct A(usize);
+
+        let mut resources = Resources::default();
+        let mut a_ref = resources.entry::<A>().or_insert(A(1));
+
+        assert_eq!(&A(1), &*a_ref);
+
+        *a_ref = A(2);
+
+        drop(a_ref);
+
+        assert_eq!(&A(2), &*resources.borrow::<A>());
+    }
 
     #[test]
     fn insert() {
