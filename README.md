@@ -19,7 +19,7 @@ This library provides a map that can store one of any type, as well as mutable b
 Add the following to `Cargo.toml`
 
 ```toml
-resman = "0.1.0"
+resman = "0.4.0"
 ```
 
 In code:
