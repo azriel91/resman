@@ -20,6 +20,52 @@ pub struct Resources(RtMap<TypeId, Box<dyn Resource>>);
 ///
 /// Resources are identified by `TypeId`s, which consist of a `TypeId`.
 impl Resources {
+    /// Creates an empty `Resources` map.
+    ///
+    /// The map is initially created with a capacity of 0, so it will not
+    /// allocate until it is first inserted into.
+    ///
+    /// # Examples
+    ///
+    /// ```rust
+    /// use resman::Resources;
+    /// let mut resources = Resources::new();
+    /// ```
+    pub fn new() -> Self {
+        Self::default()
+    }
+
+    /// Creates an empty `Resources` map with the specified capacity.
+    ///
+    /// The map will be able to hold at least capacity elements without
+    /// reallocating. If capacity is 0, the map will not allocate.
+    ///
+    /// # Examples
+    ///
+    /// ```rust
+    /// use resman::Resources;
+    /// let resources: Resources = Resources::with_capacity(10);
+    /// ```
+    pub fn with_capacity(capacity: usize) -> Self {
+        Self(RtMap::with_capacity(capacity))
+    }
+
+    /// Returns the number of elements the map can hold without reallocating.
+    ///
+    /// This number is a lower bound; the `Resources<K, V>` might be able to
+    /// hold more, but is guaranteed to be able to hold at least this many.
+    ///
+    /// # Examples
+    ///
+    /// ```rust
+    /// use resman::Resources;
+    /// let resources: Resources = Resources::with_capacity(100);
+    /// assert!(resources.capacity() >= 100);
+    /// ```
+    pub fn capacity(&self) -> usize {
+        self.0.capacity()
+    }
+
     /// Returns an entry for the resource with type `R`.
     pub fn entry<R>(&mut self) -> Entry<R>
     where
@@ -160,7 +206,7 @@ mod tests {
         #[derive(Debug, PartialEq)]
         struct A(usize);
 
-        let mut resources = Resources::default();
+        let mut resources = Resources::new();
         let mut a_ref = resources.entry::<A>().or_insert(A(1));
 
         assert_eq!(&A(1), &*a_ref);
@@ -170,6 +216,12 @@ mod tests {
         drop(a_ref);
 
         assert_eq!(&A(2), &*resources.borrow::<A>());
+    }
+
+    #[test]
+    fn with_capacity_reserves_enough_capacity() {
+        let map = Resources::with_capacity(100);
+        assert!(map.capacity() >= 100);
     }
 
     #[test]
