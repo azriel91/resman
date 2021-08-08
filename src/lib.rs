@@ -17,7 +17,7 @@
 //! Add the following to `Cargo.toml`
 //!
 //! ```toml
-//! resman = "0.4.0"
+//! resman = "0.5.0"
 //! ```
 //!
 //! In code:
