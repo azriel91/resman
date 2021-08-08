@@ -1,5 +1,8 @@
 [default]
 
+[debug]
+features = "debug"
+
 [report]
 out = ["Html", "Xml"]
 output-dir = "target/tarpaulin"

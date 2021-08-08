@@ -1,6 +1,9 @@
 use resman::Resources;
 
+#[cfg_attr(feature = "debug", derive(Debug))]
 struct A(u32);
+
+#[cfg_attr(feature = "debug", derive(Debug))]
 struct B(u32);
 
 fn main() {

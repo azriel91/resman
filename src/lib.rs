@@ -25,7 +25,9 @@
 //! ```rust
 //! use resman::Resources;
 //!
+//! #[derive(Debug)]
 //! struct A(u32);
+//! #[derive(Debug)]
 //! struct B(u32);
 //!
 //! let mut resources = Resources::default();
@@ -63,6 +65,34 @@
 //! };
 //! println!("a_try_borrow_mut: {}", exists); // prints "None"
 //! ```
+//!
+//! ### Features
+//!
+//! * `"debug"`:
+//!
+//!     The `Debug` implementation for `Resources` will use the `Debug`
+//!     implementation for the values when printed. This requires that all
+//!     `Resources` to also implement `Debug`.
+//!
+//!     Given the following:
+//!
+//!     ```rust,ignore
+//!     let mut resources = Resources::default();
+//!     resources.insert(1u32);
+//!     println!("{:?}", resources);
+//!     ```
+//!
+//!     Without `"debug"` feature:
+//!
+//!     ```rust,ignore
+//!     {TypeId { t:12849923012446332737 }: ".."}
+//!     ```
+//!
+//!     With `"debug"` feature:
+//!
+//!     ```rust,ignore
+//!     {TypeId { t: 12849923012446332737}: 1}
+//!     ```
 //!
 //! ## See Also
 //!

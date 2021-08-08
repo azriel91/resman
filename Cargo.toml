@@ -12,4 +12,7 @@ license = "MIT OR Apache-2.0"
 
 [dependencies]
 downcast-rs = "1.2.0"
-rt_map = "0.3.0"
+rt_map = "0.4.0"
+
+[features]
+debug = []
