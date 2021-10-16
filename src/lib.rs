@@ -85,13 +85,13 @@
 //!     Without `"debug"` feature:
 //!
 //!     ```rust,ignore
-//!     {TypeId { t:12849923012446332737 }: ".."}
+//!     {"u32": ".."}
 //!     ```
 //!
 //!     With `"debug"` feature:
 //!
 //!     ```rust,ignore
-//!     {TypeId { t: 12849923012446332737}: 1}
+//!     {"u32": 1}
 //!     ```
 //!
 //! ## See Also

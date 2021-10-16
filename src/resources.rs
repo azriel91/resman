@@ -223,9 +223,12 @@ impl fmt::Debug for Resources {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         let mut debug_map = f.debug_map();
 
-        self.0.iter().for_each(|(type_id, _resource)| {
+        self.0.keys().for_each(|type_id| {
+            let resource = &*self.0.borrow(type_id);
+            let type_name = resource.as_ref().type_name();
+
             // At runtime, we are unable to determine if the resource is `Debug`.
-            debug_map.entry(type_id, &"..");
+            debug_map.entry(&type_name, &"..");
         });
 
         debug_map.finish()
@@ -239,7 +242,9 @@ impl fmt::Debug for Resources {
 
         self.0.keys().for_each(|type_id| {
             let resource = &*self.0.borrow(type_id);
-            debug_map.entry(type_id, resource);
+            let type_name = resource.as_ref().type_name();
+
+            debug_map.entry(&type_name, resource);
         });
 
         debug_map.finish()
@@ -279,19 +284,13 @@ mod tests {
         resources.insert(2u64);
 
         let resources_dbg = format!("{:?}", resources);
-        let type_id_u32_dbg = format!(r#"{:?}: "..""#, TypeId::of::<u32>());
-        let type_id_u64_dbg = format!(r#"{:?}: "..""#, TypeId::of::<u64>());
         assert!(
-            resources_dbg.contains(&type_id_u32_dbg),
-            "`{}` did not contain `{}`",
-            resources_dbg,
-            type_id_u32_dbg
+            resources_dbg.contains(r#""u32": "..""#),
+            r#"Expected `resources_dbg` to contain `"u32": ".."`"#
         );
         assert!(
-            resources_dbg.contains(&type_id_u64_dbg),
-            "`{}` did not contain `{}`",
-            resources_dbg,
-            type_id_u64_dbg
+            resources_dbg.contains(r#""u64": "..""#),
+            r#"Expected `resources_dbg` to contain `"u64": ".."`"#
         );
     }
 
@@ -304,19 +303,13 @@ mod tests {
         resources.insert(2u64);
 
         let resources_dbg = format!("{:?}", resources);
-        let type_id_u32_dbg = format!(r#"{:?}: 1"#, TypeId::of::<u32>());
-        let type_id_u64_dbg = format!(r#"{:?}: 2"#, TypeId::of::<u64>());
         assert!(
-            resources_dbg.contains(&type_id_u32_dbg),
-            "`{}` did not contain `{}`",
-            resources_dbg,
-            type_id_u32_dbg
+            resources_dbg.contains(r#""u32": 1"#),
+            r#"Expected `resources_dbg` to contain `"u32": 1`"#
         );
         assert!(
-            resources_dbg.contains(&type_id_u64_dbg),
-            "`{}` did not contain `{}`",
-            resources_dbg,
-            type_id_u64_dbg
+            resources_dbg.contains(r#""u64": 2"#),
+            r#"Expected `resources_dbg` to contain `"u64": 2`"#
         );
     }
 

@@ -8,10 +8,19 @@ use downcast_rs::DowncastSync;
 /// according to Rust's typical borrowing model (one writer xor multiple
 /// readers).
 #[cfg(not(feature = "debug"))]
-pub trait Resource: DowncastSync + 'static {}
+pub trait Resource: DowncastSync + 'static {
+    fn type_name(&self) -> &'static str;
+}
 
 #[cfg(not(feature = "debug"))]
-impl<T> Resource for T where T: Any + Send + Sync {}
+impl<T> Resource for T
+where
+    T: Any + Send + Sync,
+{
+    fn type_name(&self) -> &'static str {
+        std::any::type_name::<T>()
+    }
+}
 
 /// Trait to represent any type that is `Send + Sync + 'static`.
 ///
@@ -19,9 +28,18 @@ impl<T> Resource for T where T: Any + Send + Sync {}
 /// according to Rust's typical borrowing model (one writer xor multiple
 /// readers).
 #[cfg(feature = "debug")]
-pub trait Resource: DowncastSync + std::fmt::Debug + 'static {}
+pub trait Resource: DowncastSync + std::fmt::Debug + 'static {
+    fn type_name(&self) -> &'static str;
+}
 
 #[cfg(feature = "debug")]
-impl<T> Resource for T where T: Any + std::fmt::Debug + Send + Sync {}
+impl<T> Resource for T
+where
+    T: Any + std::fmt::Debug + Send + Sync,
+{
+    fn type_name(&self) -> &'static str {
+        std::any::type_name::<T>()
+    }
+}
 
 downcast_rs::impl_downcast!(sync Resource);
