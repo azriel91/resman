@@ -33,12 +33,12 @@ fn main() {
     println!("B: {}", b.0);
 
     // Trying to mutably borrow a resource that is already borrowed (immutably
-    // or mutably) returns `None`.
+    // or mutably) returns `Err`.
     let a_try_borrow_mut = resources.try_borrow_mut::<A>();
-    let exists = if a_try_borrow_mut.is_some() {
-        "Some(..)"
+    let exists = if a_try_borrow_mut.is_ok() {
+        "Ok(..)"
     } else {
-        "None"
+        "Err"
     };
-    println!("a_try_borrow_mut: {}", exists); // prints "None"
+    println!("a_try_borrow_mut: {}", exists); // prints "Err"
 }

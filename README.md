@@ -19,10 +19,10 @@ This library provides a map that can store one of any type, as well as mutable b
 Add the following to `Cargo.toml`
 
 ```toml
-resman = "0.5.0"
+resman = "0.6.0"
 
 # or
-resman = { version = "0.5.0", features = ["debug"] }
+resman = { version = "0.6.0", features = ["debug"] }
 ```
 
 In code:
@@ -89,13 +89,13 @@ fn main() {
     Without `"debug"` feature:
 
     ```rust
-    {TypeId { t: 12849923012446332737 }: ".."}
+    {u32: ".."}
     ```
 
     With `"debug"` feature:
 
     ```rust
-    {TypeId { t: 12849923012446332737 }: 1}
+    {u32: 1}
     ```
 
 ## See Also

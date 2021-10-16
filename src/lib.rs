@@ -17,7 +17,10 @@
 //! Add the following to `Cargo.toml`
 //!
 //! ```toml
-//! resman = "0.5.0"
+//! resman = "0.6.0"
+//!
+//! # or
+//! resman = { version = "0.6.0", features = ["debug"] }
 //! ```
 //!
 //! In code:
@@ -56,14 +59,14 @@
 //! println!("B: {}", b.0);
 //!
 //! // Trying to mutably borrow a resource that is already borrowed (immutably
-//! // or mutably) returns `None`.
+//! // or mutably) returns `Err`.
 //! let a_try_borrow_mut = resources.try_borrow_mut::<A>();
-//! let exists = if a_try_borrow_mut.is_some() {
-//!     "Some(..)"
+//! let exists = if a_try_borrow_mut.is_ok() {
+//!     "Ok(..)"
 //! } else {
-//!     "None"
+//!     "Err"
 //! };
-//! println!("a_try_borrow_mut: {}", exists); // prints "None"
+//! println!("a_try_borrow_mut: {}", exists); // prints "Err"
 //! ```
 //!
 //! ### Features
@@ -85,13 +88,13 @@
 //!     Without `"debug"` feature:
 //!
 //!     ```rust,ignore
-//!     {TypeId { t:12849923012446332737 }: ".."}
+//!     {u32: ".."}
 //!     ```
 //!
 //!     With `"debug"` feature:
 //!
 //!     ```rust,ignore
-//!     {TypeId { t: 12849923012446332737}: 1}
+//!     {u32: 1}
 //!     ```
 //!
 //! ## See Also
@@ -107,6 +110,8 @@
 pub use crate::{
     entry::Entry, r#ref::Ref, ref_mut::RefMut, resource::Resource, resources::Resources,
 };
+
+pub use rt_map::BorrowFail;
 
 mod entry;
 mod r#ref;

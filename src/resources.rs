@@ -1,6 +1,6 @@
 use std::{any::TypeId, fmt};
 
-use rt_map::{Cell, RtMap};
+use rt_map::{BorrowFail, Cell, RtMap};
 
 use crate::{Entry, Ref, RefMut, Resource};
 
@@ -145,11 +145,12 @@ impl Resources {
     where
         R: Resource,
     {
-        Ref::new(self.0.borrow(&TypeId::of::<R>()))
+        self.try_borrow::<R>()
+            .unwrap_or_else(Self::borrow_panic::<R, _>)
     }
 
     /// Returns an immutable reference to `R` if it exists, `None` otherwise.
-    pub fn try_borrow<R>(&self) -> Option<Ref<R>>
+    pub fn try_borrow<R>(&self) -> Result<Ref<R>, BorrowFail>
     where
         R: Resource,
     {
@@ -166,11 +167,12 @@ impl Resources {
     where
         R: Resource,
     {
-        RefMut::new(self.0.borrow_mut(&TypeId::of::<R>()))
+        self.try_borrow_mut::<R>()
+            .unwrap_or_else(Self::borrow_panic::<R, _>)
     }
 
     /// Returns a mutable reference to `R` if it exists, `None` otherwise.
-    pub fn try_borrow_mut<R>(&self) -> Option<RefMut<R>>
+    pub fn try_borrow_mut<R>(&self) -> Result<RefMut<R>, BorrowFail>
     where
         R: Resource,
     {
@@ -194,6 +196,26 @@ impl Resources {
     pub fn get_raw(&self, id: &TypeId) -> Option<&Cell<Box<dyn Resource>>> {
         self.0.get_raw(id)
     }
+
+    fn borrow_panic<R, Ret>(borrow_fail: BorrowFail) -> Ret {
+        let type_name = std::any::type_name::<R>();
+        match borrow_fail {
+            BorrowFail::ValueNotFound => {
+                panic!(
+                    "Expected to borrow `{type_name}`, but it does not exist.",
+                    type_name = type_name
+                )
+            }
+            BorrowFail::BorrowConflictImm => panic!(
+                "Expected to borrow `{type_name}` immutably, but it was already borrowed mutably.",
+                type_name = type_name
+            ),
+            BorrowFail::BorrowConflictMut => panic!(
+                "Expected to borrow `{type_name}` mutably, but it was already borrowed mutably.",
+                type_name = type_name
+            ),
+        }
+    }
 }
 
 #[cfg(not(feature = "debug"))]
@@ -201,9 +223,12 @@ impl fmt::Debug for Resources {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         let mut debug_map = f.debug_map();
 
-        self.0.iter().for_each(|(type_id, _resource)| {
+        self.0.keys().for_each(|type_id| {
+            let resource = &*self.0.borrow(type_id);
+            let type_name = resource.as_ref().type_name();
+
             // At runtime, we are unable to determine if the resource is `Debug`.
-            debug_map.entry(type_id, &"..");
+            debug_map.entry(&type_name, &"..");
         });
 
         debug_map.finish()
@@ -217,7 +242,9 @@ impl fmt::Debug for Resources {
 
         self.0.keys().for_each(|type_id| {
             let resource = &*self.0.borrow(type_id);
-            debug_map.entry(type_id, resource);
+            let type_name = resource.as_ref().type_name();
+
+            debug_map.entry(&type_name, resource);
         });
 
         debug_map.finish()
@@ -229,6 +256,7 @@ mod tests {
     use std::any::TypeId;
 
     use super::Resources;
+    use crate::BorrowFail;
 
     #[test]
     fn entry_or_insert_inserts_value() {
@@ -256,19 +284,15 @@ mod tests {
         resources.insert(2u64);
 
         let resources_dbg = format!("{:?}", resources);
-        let type_id_u32_dbg = format!(r#"{:?}: "..""#, TypeId::of::<u32>());
-        let type_id_u64_dbg = format!(r#"{:?}: "..""#, TypeId::of::<u64>());
         assert!(
-            resources_dbg.contains(&type_id_u32_dbg),
-            "`{}` did not contain `{}`",
-            resources_dbg,
-            type_id_u32_dbg
+            resources_dbg.contains(r#"u32: "..""#),
+            r#"Expected `{}` to contain `u32: ".."`"#,
+            resources_dbg
         );
         assert!(
-            resources_dbg.contains(&type_id_u64_dbg),
-            "`{}` did not contain `{}`",
-            resources_dbg,
-            type_id_u64_dbg
+            resources_dbg.contains(r#"u64: "..""#),
+            r#"Expected `{}` to contain `u64: ".."`"#,
+            resources_dbg
         );
     }
 
@@ -281,19 +305,15 @@ mod tests {
         resources.insert(2u64);
 
         let resources_dbg = format!("{:?}", resources);
-        let type_id_u32_dbg = format!(r#"{:?}: 1"#, TypeId::of::<u32>());
-        let type_id_u64_dbg = format!(r#"{:?}: 2"#, TypeId::of::<u64>());
         assert!(
-            resources_dbg.contains(&type_id_u32_dbg),
-            "`{}` did not contain `{}`",
-            resources_dbg,
-            type_id_u32_dbg
+            resources_dbg.contains(r#"u32: 1"#),
+            r#"Expected `{}` to contain `u32: 1`"#,
+            resources_dbg
         );
         assert!(
-            resources_dbg.contains(&type_id_u64_dbg),
-            "`{}` did not contain `{}`",
-            resources_dbg,
-            type_id_u64_dbg
+            resources_dbg.contains(r#"u64: 2"#),
+            r#"Expected `{}` to contain `u64: 2`"#,
+            resources_dbg
         );
     }
 
@@ -316,7 +336,9 @@ mod tests {
     }
 
     #[test]
-    #[should_panic(expected = "but it was already borrowed")]
+    #[should_panic(
+        expected = "Expected to borrow `resman::resources::tests::Res` mutably, but it was already borrowed mutably."
+    )]
     fn read_write_fails() {
         let mut resources = Resources::default();
         resources.insert(Res);
@@ -352,43 +374,72 @@ mod tests {
     }
 
     #[test]
-    fn borrow_mut_try_borrow_returns_none() {
+    #[should_panic(
+        expected = "Expected to borrow `resman::resources::tests::Res`, but it does not exist."
+    )]
+    fn borrow_before_insert_panics() {
+        let resources = Resources::default();
+
+        resources.borrow::<Res>();
+    }
+
+    #[test]
+    #[should_panic(
+        expected = "Expected to borrow `resman::resources::tests::Res`, but it does not exist."
+    )]
+    fn borrow_mut_before_insert_panics() {
+        let resources = Resources::default();
+
+        resources.borrow_mut::<Res>();
+    }
+
+    #[test]
+    fn borrow_mut_try_borrow_returns_err() {
         let mut resources = Resources::default();
         resources.insert(Res);
 
         let _res = resources.borrow_mut::<Res>();
 
-        assert_eq!(None, resources.try_borrow::<Res>());
+        assert_eq!(
+            Err(BorrowFail::BorrowConflictImm),
+            resources.try_borrow::<Res>()
+        );
     }
 
     #[test]
-    fn borrow_try_borrow_mut_returns_none() {
+    fn borrow_try_borrow_mut_returns_err() {
         let mut resources = Resources::default();
         resources.insert(Res);
 
         let _res = resources.borrow::<Res>();
 
-        assert_eq!(None, resources.try_borrow_mut::<Res>());
+        assert_eq!(
+            Err(BorrowFail::BorrowConflictMut),
+            resources.try_borrow_mut::<Res>()
+        );
     }
 
     #[test]
-    fn borrow_mut_borrow_mut_returns_none() {
+    fn borrow_mut_borrow_mut_returns_err() {
         let mut resources = Resources::default();
         resources.insert(Res);
 
         let _res = resources.borrow_mut::<Res>();
 
-        assert_eq!(None, resources.try_borrow_mut::<Res>());
+        assert_eq!(
+            Err(BorrowFail::BorrowConflictMut),
+            resources.try_borrow_mut::<Res>()
+        );
     }
 
     #[test]
-    fn get_mut_returns_some() {
+    fn get_mut_returns_ok() {
         let mut resources = Resources::default();
         resources.insert(Res);
 
         let _res = resources.get_mut::<Res>();
 
-        assert!(resources.try_borrow_mut::<Res>().is_some());
+        assert!(resources.try_borrow_mut::<Res>().is_ok());
     }
 
     #[test]
