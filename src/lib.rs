@@ -17,7 +17,10 @@
 //! Add the following to `Cargo.toml`
 //!
 //! ```toml
-//! resman = "0.5.0"
+//! resman = "0.6.0"
+//!
+//! # or
+//! resman = { version = "0.6.0", features = ["debug"] }
 //! ```
 //!
 //! In code:
