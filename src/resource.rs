@@ -9,7 +9,7 @@ use downcast_rs::DowncastSync;
 /// readers).
 #[cfg(not(feature = "debug"))]
 pub trait Resource: DowncastSync + 'static {
-    fn type_name(&self) -> &'static str;
+    fn type_name(&self) -> TypeNameLit;
 }
 
 #[cfg(not(feature = "debug"))]
@@ -17,8 +17,8 @@ impl<T> Resource for T
 where
     T: Any + Send + Sync,
 {
-    fn type_name(&self) -> &'static str {
-        std::any::type_name::<T>()
+    fn type_name(&self) -> TypeNameLit {
+        TypeNameLit(std::any::type_name::<T>())
     }
 }
 
@@ -29,7 +29,7 @@ where
 /// readers).
 #[cfg(feature = "debug")]
 pub trait Resource: DowncastSync + std::fmt::Debug + 'static {
-    fn type_name(&self) -> &'static str;
+    fn type_name(&self) -> TypeNameLit;
 }
 
 #[cfg(feature = "debug")]
@@ -37,9 +37,19 @@ impl<T> Resource for T
 where
     T: Any + std::fmt::Debug + Send + Sync,
 {
-    fn type_name(&self) -> &'static str {
-        std::any::type_name::<T>()
+    fn type_name(&self) -> TypeNameLit {
+        TypeNameLit(std::any::type_name::<T>())
     }
 }
 
 downcast_rs::impl_downcast!(sync Resource);
+
+use std::fmt;
+
+pub struct TypeNameLit(&'static str);
+
+impl fmt::Debug for TypeNameLit {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        write!(f, "{}", self.0)
+    }
+}

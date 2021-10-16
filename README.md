@@ -89,13 +89,13 @@ fn main() {
     Without `"debug"` feature:
 
     ```rust
-    {"u32": ".."}
+    {u32: ".."}
     ```
 
     With `"debug"` feature:
 
     ```rust
-    {"u32": 1}
+    {u32: 1}
     ```
 
 ## See Also

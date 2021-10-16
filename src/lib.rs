@@ -85,13 +85,13 @@
 //!     Without `"debug"` feature:
 //!
 //!     ```rust,ignore
-//!     {"u32": ".."}
+//!     {u32: ".."}
 //!     ```
 //!
 //!     With `"debug"` feature:
 //!
 //!     ```rust,ignore
-//!     {"u32": 1}
+//!     {u32: 1}
 //!     ```
 //!
 //! ## See Also

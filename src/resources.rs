@@ -285,12 +285,14 @@ mod tests {
 
         let resources_dbg = format!("{:?}", resources);
         assert!(
-            resources_dbg.contains(r#""u32": "..""#),
-            r#"Expected `resources_dbg` to contain `"u32": ".."`"#
+            resources_dbg.contains(r#"u32: "..""#),
+            r#"Expected `{}` to contain `u32: ".."`"#,
+            resources_dbg
         );
         assert!(
-            resources_dbg.contains(r#""u64": "..""#),
-            r#"Expected `resources_dbg` to contain `"u64": ".."`"#
+            resources_dbg.contains(r#"u64: "..""#),
+            r#"Expected `{}` to contain `u64: ".."`"#,
+            resources_dbg
         );
     }
 
@@ -304,12 +306,14 @@ mod tests {
 
         let resources_dbg = format!("{:?}", resources);
         assert!(
-            resources_dbg.contains(r#""u32": 1"#),
-            r#"Expected `resources_dbg` to contain `"u32": 1`"#
+            resources_dbg.contains(r#"u32: 1"#),
+            r#"Expected `{}` to contain `u32: 1`"#,
+            resources_dbg
         );
         assert!(
-            resources_dbg.contains(r#""u64": 2"#),
-            r#"Expected `resources_dbg` to contain `"u64": 2`"#
+            resources_dbg.contains(r#"u64: 2"#),
+            r#"Expected `{}` to contain `u64: 2`"#,
+            resources_dbg
         );
     }
 
