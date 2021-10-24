@@ -95,17 +95,29 @@ mod fn_resource_impl {
                 write!(
                     impls_buffer,
                     r#"
-    impl<Fun, Ret, {args_csv}> FnResource<Fun, Ret, ({arg_refs_csv})>
-    where
-        Fun: Fn({arg_refs_csv}) -> Ret,
-        {arg_bounds_list}
-    {{
-        pub fn call<'f>(&self, resources: &Resources) -> Ret {{
-            {resource_arg_borrows}
+impl<Fun, Ret, {args_csv}> FnResource<Fun, Ret, ({arg_refs_csv})>
+where
+    Fun: Fn({arg_refs_csv}) -> Ret,
+    {arg_bounds_list}
+{{
+    pub fn call<'f>(&self, resources: &Resources) -> Ret {{
+        {resource_arg_borrows}
 
-            (self.func)({resource_arg_vars})
-        }}
+        (self.func)({resource_arg_vars})
     }}
+}}
+
+impl<Fun, Ret, {args_csv}> FnRes for FnResource<Fun, Ret, ({arg_refs_csv})>
+where
+    Fun: Fn({arg_refs_csv}) -> Ret,
+    {arg_bounds_list}
+{{
+    type Ret = Ret;
+
+    fn call<'f>(&self, resources: &Resources) -> Ret {{
+        Self::call(self, resources)
+    }}
+}}
         "#,
                     args_csv = args_csv,
                     arg_refs_csv = arg_refs_csv,

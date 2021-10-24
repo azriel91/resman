@@ -1,6 +1,6 @@
 use core::marker::PhantomData;
 
-use crate::Resources;
+use crate::{FnRes, Resources};
 
 /// Function that gets its arguments / parameters from a `Resources` map.
 pub struct FnResource<Fun, Ret, Args> {
@@ -14,6 +14,7 @@ include!(concat!(env!("OUT_DIR"), "/fn_resource_impl.rs"));
 
 /// Extension to return [`FnResource`] for a function.
 pub trait IntoFnResource<Fun, Ret, Args> {
+    /// Returns the function wrapped as a `FnResource`.
     fn into_fn_resource(self) -> FnResource<Fun, Ret, Args>;
 }
 

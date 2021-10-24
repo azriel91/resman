@@ -120,7 +120,12 @@ mod resource;
 mod resources;
 
 #[cfg(feature = "fn_res")]
-pub use crate::fn_resource::IntoFnResource;
+pub use crate::{
+    fn_res::{FnRes, IntoFnRes},
+    fn_resource::{FnResource, IntoFnResource},
+};
 
+#[cfg(feature = "fn_res")]
+mod fn_res;
 #[cfg(feature = "fn_res")]
 mod fn_resource;
