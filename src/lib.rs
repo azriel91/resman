@@ -118,3 +118,9 @@ mod r#ref;
 mod ref_mut;
 mod resource;
 mod resources;
+
+#[cfg(feature = "fn_res")]
+pub use crate::fn_resource::IntoFnResource;
+
+#[cfg(feature = "fn_res")]
+mod fn_resource;
