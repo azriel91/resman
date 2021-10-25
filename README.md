@@ -111,8 +111,12 @@ generic function type.
 Usage of this API is as follows:
 
 1. Define regular functions or closures to run.
+
     - The functions should take `&T` or `&mut T` as parameters.
     - The return type of all functions should be the same.
+
+    Currently there is a limit of 7 parameters.
+
 2. Call `my_function.into_fn_res()` to obtain a `Box<dyn FnRes>`.
 3. Call `fn_res.call(&resources)` to automatically borrow `T` from
    `resources` and invoke the function.
