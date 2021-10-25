@@ -3,6 +3,12 @@
 [debug]
 features = "debug"
 
+[fn_res]
+features = "fn_res"
+
+[debug_fn_res]
+features = "debug fn_res"
+
 [report]
 out = ["Html", "Xml"]
 output-dir = "target/tarpaulin"

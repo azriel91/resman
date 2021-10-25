@@ -10,9 +10,14 @@ readme = "README.md"
 keywords = ["data", "share", "lock"]
 license = "MIT OR Apache-2.0"
 
+[package.metadata.docs.rs]
+features = ["debug", "fn_res"]
+
 [dependencies]
 downcast-rs = "1.2.0"
 rt_map = "0.5.0"
 
 [features]
+default = []
 debug = []
+fn_res = []

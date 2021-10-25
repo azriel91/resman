@@ -108,7 +108,7 @@ jobs:
       - uses: actions-rs/cargo@v1
         with:
           command: test
-          args: --release
+          args: --release --features "debug fn_res"
 
   build_and_test_windows:
     name: Build and Test (Windows)
@@ -128,4 +128,4 @@ jobs:
       - uses: actions-rs/cargo@v1
         with:
           command: test
-          args: --release
+          args: --release --features "debug fn_res"
