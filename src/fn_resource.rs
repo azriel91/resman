@@ -1,5 +1,7 @@
 use core::marker::PhantomData;
 
+use rt_map::BorrowFail;
+
 use crate::{FnRes, Resources};
 
 /// Function that gets its arguments / parameters from a `Resources` map.

@@ -88,6 +88,7 @@ mod fn_resource_impl {
                 // let mut a1 = resources.borrow_mut::<A1>();
                 // ..
                 let resource_arg_borrows = resource_arg_borrows(arg_refs);
+                let resource_arg_try_borrows = resource_arg_try_borrows(arg_refs);
 
                 // &*a0, &mut *a1
                 let resource_arg_vars = resource_arg_vars::<N>(arg_refs);
@@ -105,6 +106,13 @@ where
 
         (self.func)({resource_arg_vars})
     }}
+
+    pub fn try_call<'f>(&self, resources: &Resources) -> Result<Ret, BorrowFail> {{
+        {resource_arg_try_borrows}
+
+        let ret_value = (self.func)({resource_arg_vars});
+        Ok(ret_value)
+    }}
 }}
 
 impl<Fun, Ret, {args_csv}> FnRes for FnResource<Fun, Ret, ({arg_refs_csv})>
@@ -117,12 +125,17 @@ where
     fn call<'f>(&self, resources: &Resources) -> Ret {{
         Self::call(self, resources)
     }}
+
+    fn try_call<'f>(&self, resources: &Resources) -> Result<Ret, BorrowFail> {{
+        Self::try_call(self, resources)
+    }}
 }}
-        "#,
+"#,
                     args_csv = args_csv,
                     arg_refs_csv = arg_refs_csv,
                     arg_bounds_list = arg_bounds_list,
                     resource_arg_borrows = resource_arg_borrows,
+                    resource_arg_try_borrows = resource_arg_try_borrows,
                     resource_arg_vars = resource_arg_vars,
                 )
                 .expect("Failed to append to impls_buffer.");
@@ -169,6 +182,26 @@ where
             })
             .expect("Failed to append to `resource_arg_borrows` string.");
         resource_arg_borrows
+    }
+
+    fn resource_arg_try_borrows<const N: usize>(arg_refs: [Ref; N]) -> String {
+        let mut resource_arg_try_borrows = String::with_capacity(N * 44);
+        let mut arg_refs_iter = arg_refs.iter().copied().enumerate();
+        arg_refs_iter
+            .try_for_each(|(index, arg_ref)| match arg_ref {
+                Ref::Immutable => writeln!(
+                    &mut resource_arg_try_borrows,
+                    "let a{index} = resources.try_borrow::<A{index}>()?;",
+                    index = index
+                ),
+                Ref::Mutable => writeln!(
+                    &mut resource_arg_try_borrows,
+                    "let mut a{index} = resources.try_borrow_mut::<A{index}>()?;",
+                    index = index
+                ),
+            })
+            .expect("Failed to append to `resource_arg_try_borrows` string.");
+        resource_arg_try_borrows
     }
 
     fn arg_refs_combinations<const N: usize>() -> impl Iterator<Item = [Ref; N]> {

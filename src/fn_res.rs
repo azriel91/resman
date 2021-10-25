@@ -1,3 +1,5 @@
+use rt_map::BorrowFail;
+
 use crate::{FnResource, IntoFnResource, Resources};
 
 /// Function that gets its arguments / parameters from a `Resources` map.
@@ -11,6 +13,9 @@ pub trait FnRes {
 
     /// Runs the function.
     fn call<'f>(&self, resources: &Resources) -> Self::Ret;
+
+    /// Runs the function.
+    fn try_call<'f>(&self, resources: &Resources) -> Result<Self::Ret, BorrowFail>;
 }
 
 /// Extension to return `Box<dyn FnRes>` for a function.
@@ -135,6 +140,8 @@ where
 
 #[cfg(test)]
 mod tests {
+    use rt_map::BorrowFail;
+
     use super::IntoFnRes;
     use crate::Resources;
 
@@ -177,10 +184,83 @@ mod tests {
 
         let sum = fn_reses
             .iter()
-            .fold(0, |sum, fn_res| sum + fn_res.call(&mut resources));
+            .fold(0, |sum, fn_res| sum + fn_res.call(&resources));
 
         assert_eq!(9, resources.borrow::<S0>().0);
         assert_eq!(267, sum);
+    }
+
+    #[test]
+    fn try_call_no_overlap_returns_ok() -> Result<(), BorrowFail> {
+        let fn_reses = [
+            f_r1.into_fn_res(),
+            f_r2.into_fn_res(),
+            f_r3.into_fn_res(),
+            f_r4.into_fn_res(),
+            f_r5.into_fn_res(),
+            f_r6.into_fn_res(),
+            f_w1.into_fn_res(),
+            f_w2.into_fn_res(),
+            f_w3.into_fn_res(),
+            f_w4.into_fn_res(),
+            f_w5.into_fn_res(),
+            f_w6.into_fn_res(),
+            f_r1_w1.into_fn_res(),
+            f_w1_r1.into_fn_res(),
+            f_r1_w1_r1.into_fn_res(),
+            f_w1_r1_w1.into_fn_res(),
+            f_w2_r2_w2_r1.into_fn_res(),
+            // closure
+            (|s0: &S0, s1: &mut S1| {
+                s1.0 += 1;
+                s0.0 + s1.0
+            })
+            .into_fn_res(),
+        ];
+
+        let mut resources = Resources::new();
+        resources.insert(S0(0));
+        resources.insert(S1(1));
+        resources.insert(S2(2));
+        resources.insert(S3(3));
+        resources.insert(S4(4));
+        resources.insert(S5(5));
+        resources.insert(S6(6));
+
+        let sum = fn_reses.iter().try_fold(0, |sum, fn_res| {
+            fn_res.try_call(&resources).map(|ret| sum + ret)
+        })?;
+
+        assert_eq!(9, resources.borrow::<S0>().0);
+        assert_eq!(267, sum);
+
+        Ok(())
+    }
+
+    #[test]
+    fn try_call_with_overlap_returns_borrow_fail() -> Result<(), BorrowFail> {
+        let fn_reses = [
+            f_r1.into_fn_res(),
+            (|s0: &S0, s1: &mut S1| {
+                s1.0 += 1;
+                s0.0 + s1.0
+            })
+            .into_fn_res(),
+        ];
+
+        let mut resources = Resources::new();
+        resources.insert(S0(0));
+        resources.insert(S1(1));
+
+        let _s1_borrow = resources.borrow::<S1>();
+
+        let result = fn_reses.iter().try_fold(0, |sum, fn_res| {
+            fn_res.try_call(&resources).map(|ret| sum + ret)
+        });
+
+        assert_eq!(Err(BorrowFail::BorrowConflictMut), result);
+
+        Ok(())
     }
 
     fn f_r1(s0: &S0) -> usize {
