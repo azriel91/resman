@@ -6,6 +6,8 @@
 //! **Note:** This implementation is extracted from [`shred`], with the
 //! following differences:
 //!
+//! * `Debug` implementation prints out the type name instead of type ID for the
+//!   key.
 //! * Uses [`downcast-rs`] instead of [`mopa`] for downcasting types.
 //! * Adds `Debug` and `PartialEq` implementations for borrow types when the
 //!   resource type implements those traits.
@@ -101,8 +103,9 @@
 //!
 //! Usage of this API is as follows:
 //!
-//! 1. Define regular functions or closures that take `&T1` or `&mut T` as
-//!    parameters.
+//! 1. Define regular functions or closures to run.
+//!     - The functions should take `&T` or `&mut T` as parameters.
+//!     - The return type of all functions should be the same.
 //! 2. Call `my_function.into_fn_res()` to obtain a `Box<dyn FnRes>`.
 //! 3. Call `fn_res.call(&resources)` to automatically borrow `T` from
 //!    `resources` and invoke the function.
