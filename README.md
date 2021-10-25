@@ -18,7 +18,7 @@ following differences:
 * Uses [`downcast-rs`] instead of [`mopa`] for downcasting types.
 * Adds `Debug` and `PartialEq` implementations for borrow types when the
   resource type implements those traits.
-* Returns `None` instead of panicking for `try_borrow*` functions when the
+* Returns `Err` instead of panicking for `try_borrow*` functions when the
   resource is already borrowed.
 
 ## Usage
@@ -175,6 +175,7 @@ Use [`FnRes::try_call`] for a non-panicking version, which will return a
 [`anymap`]: https://github.com/chris-morgan/anymap
 [`downcast-rs`]: https://github.com/marcianx/downcast-rs
 [`mopa`]: https://github.com/chris-morgan/mopa
+[`rt_map`]: https://github.com/azriel91/rt_map
 [`shred`]: https://github.com/amethyst/shred
 
 ## License
