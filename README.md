@@ -26,11 +26,11 @@ following differences:
 Add the following to `Cargo.toml`
 
 ```toml
-resman = "0.6.0"
+resman = "0.7.0"
 
 # or
-resman = { version = "0.6.0", features = ["debug"] }
-resman = { version = "0.6.0", features = ["fn_res"] }
+resman = { version = "0.7.0", features = ["debug"] }
+resman = { version = "0.7.0", features = ["fn_res"] }
 ```
 
 In code:
@@ -90,8 +90,8 @@ implementation for the values when printed. This requires that all
 Example:
 
 ```rust
-# use resman::Resources;
-#
+use resman::Resources;
+
 let mut resources = Resources::default();
 resources.insert(1u32);
 println!("{:?}", resources);
