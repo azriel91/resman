@@ -162,6 +162,7 @@
 //! ## See Also
 //!
 //! * [`anymap`]: Map of any type, without multiple mutable borrows.
+//! * [`rt_map`]: Runtime managed mutable borrowing from a map.
 //! * [`shred`]: Contains `Resources` type, plus a task dispatcher.
 //!
 //! [`anymap`]: https://github.com/chris-morgan/anymap
