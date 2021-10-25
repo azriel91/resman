@@ -21,6 +21,7 @@
 //!
 //! # or
 //! resman = { version = "0.6.0", features = ["debug"] }
+//! resman = { version = "0.6.0", features = ["fn_res"] }
 //! ```
 //!
 //! In code:
@@ -71,31 +72,85 @@
 //!
 //! ### Features
 //!
-//! * `"debug"`:
+//! #### `"debug"`:
 //!
-//!     The `Debug` implementation for `Resources` will use the `Debug`
-//!     implementation for the values when printed. This requires that all
-//!     `Resources` to also implement `Debug`.
+//! The `Debug` implementation for `Resources` will use the `Debug`
+//! implementation for the values when printed. This requires that all
+//! `Resources` to also implement `Debug`.
 //!
-//!     Given the following:
+//! Example:
 //!
-//!     ```rust,ignore
-//!     let mut resources = Resources::default();
-//!     resources.insert(1u32);
-//!     println!("{:?}", resources);
-//!     ```
+//! ```rust
+//! # use resman::Resources;
+//! #
+//! let mut resources = Resources::default();
+//! resources.insert(1u32);
+//! println!("{:?}", resources);
 //!
-//!     Without `"debug"` feature:
+//! // Without `"debug"` feature:
+//! // {u32: ".."}
 //!
-//!     ```rust,ignore
-//!     {u32: ".."}
-//!     ```
+//! // With `"debug"` feature:
+//! // {u32: 1}
+//! ```
 //!
-//!     With `"debug"` feature:
+//! #### `"fn_res"`:
 //!
-//!     ```rust,ignore
-//!     {u32: 1}
-//!     ```
+//! Enables the [`FnRes`] trait, allowing dynamic functions invocation under a
+//! generic function type.
+//!
+//! Usage of this API is as follows:
+//!
+//! 1. Define regular functions or closures that take `&T1` or `&mut T` as
+//!    parameters.
+//! 2. Call `my_function.into_fn_res()` to obtain a `Box<dyn FnRes>`.
+//! 3. Call `fn_res.call(&resources)` to automatically borrow `T` from
+//!    `resources` and invoke the function.
+//!
+//! Example:
+//!
+//! ```rust
+//! use resman::{FnRes, IntoFnRes, Resources};
+//!
+//! /// Borrows `u32` mutably, and `u64` immutably.
+//! fn f1(a: &mut u32, b: &u64) -> u64 {
+//!     *a += 1;
+//!     *a as u64 + *b
+//! }
+//!
+//! /// Borrows `u32` immutably, and `u64` mutably.
+//! fn f2(a: &u32, b: &mut u64) -> u64 {
+//!     *b += 1;
+//!     *a as u64 + *b
+//! }
+//!
+//! let functions = [
+//!     f1.into_fn_res(),
+//!     f2.into_fn_res(),
+//!     (|a: &u32, b: &u64| *a as u64 + *b).into_fn_res(),
+//! ];
+//!
+//! let mut resources = Resources::default();
+//! resources.insert(0u32);
+//! resources.insert(0u64);
+//!
+//! let sum = functions
+//!     .iter()
+//!     .fold(0, |sum, fn_res| sum + fn_res.call(&resources));
+//!
+//! assert_eq!(5, sum); // 1 + 2 + 2
+//!
+//! let debug_str = format!("{:?}", resources);
+//! assert!(debug_str.contains("u32: 1"));
+//! assert!(debug_str.contains("u64: 1"));
+//! ```
+//!
+//! Since `Resources` has internal mutability, care must be taken to not run
+//! multiple functions that borrow the same value mutably from `Resources` at
+//! the same time when using [`FnRes::call`], otherwise it will panic.
+//!
+//! Use [`FnRes::try_call`] for a non-panicking version, which will return a
+//! [`BorrowFail`] error if there is an overlapping borrow conflict at runtime.
 //!
 //! ## See Also
 //!
