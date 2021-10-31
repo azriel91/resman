@@ -101,13 +101,13 @@ where
     Fun: Fn({arg_refs_csv}) -> Ret,
     {arg_bounds_list}
 {{
-    pub fn call<'f>(&self, resources: &Resources) -> Ret {{
+    pub fn call(&self, resources: &Resources) -> Ret {{
         {resource_arg_borrows}
 
         (self.func)({resource_arg_vars})
     }}
 
-    pub fn try_call<'f>(&self, resources: &Resources) -> Result<Ret, BorrowFail> {{
+    pub fn try_call(&self, resources: &Resources) -> Result<Ret, BorrowFail> {{
         {resource_arg_try_borrows}
 
         let ret_value = (self.func)({resource_arg_vars});
@@ -122,11 +122,11 @@ where
 {{
     type Ret = Ret;
 
-    fn call<'f>(&self, resources: &Resources) -> Ret {{
+    fn call(&self, resources: &Resources) -> Ret {{
         Self::call(self, resources)
     }}
 
-    fn try_call<'f>(&self, resources: &Resources) -> Result<Ret, BorrowFail> {{
+    fn try_call(&self, resources: &Resources) -> Result<Ret, BorrowFail> {{
         Self::try_call(self, resources)
     }}
 }}

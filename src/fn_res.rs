@@ -12,10 +12,10 @@ pub trait FnRes {
     type Ret;
 
     /// Runs the function.
-    fn call<'f>(&self, resources: &Resources) -> Self::Ret;
+    fn call(&self, resources: &Resources) -> Self::Ret;
 
     /// Runs the function.
-    fn try_call<'f>(&self, resources: &Resources) -> Result<Self::Ret, BorrowFail>;
+    fn try_call(&self, resources: &Resources) -> Result<Self::Ret, BorrowFail>;
 }
 
 /// Extension to return `Box<dyn FnRes>` for a function.

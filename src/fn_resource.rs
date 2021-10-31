@@ -18,11 +18,11 @@ impl<Fun, Ret> FnResource<Fun, Ret, ()>
 where
     Fun: Fn() -> Ret,
 {
-    pub fn call<'f>(&self, _resources: &Resources) -> Ret {
+    pub fn call(&self, _resources: &Resources) -> Ret {
         (self.func)()
     }
 
-    pub fn try_call<'f>(&self, _resources: &Resources) -> Result<Ret, BorrowFail> {
+    pub fn try_call(&self, _resources: &Resources) -> Result<Ret, BorrowFail> {
         let ret_value = (self.func)();
         Ok(ret_value)
     }
