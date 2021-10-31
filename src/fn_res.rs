@@ -26,10 +26,12 @@ pub trait IntoFnRes<Fun, Ret, Args> {
 
 impl<Fun, Ret> IntoFnRes<Fun, Ret, ()> for Fun
 where
-    Fun: FnRes<Ret = Ret> + 'static,
+    Fun: Fn() -> Ret + 'static,
+    Ret: 'static,
+    FnResource<Fun, Ret, ()>: FnRes<Ret = Ret>,
 {
     fn into_fn_res(self) -> Box<dyn FnRes<Ret = Ret>> {
-        Box::new(self)
+        Box::new(self.into_fn_resource())
     }
 }
 
@@ -210,7 +212,10 @@ mod tests {
             f_r1_w1_r1.into_fn_res(),
             f_w1_r1_w1.into_fn_res(),
             f_w2_r2_w2_r1.into_fn_res(),
-            // closure
+            // closures
+            // zero args
+            (|| 0usize).into_fn_res(),
+            // two args
             (|s0: &S0, s1: &mut S1| {
                 s1.0 += 1;
                 s0.0 + s1.0

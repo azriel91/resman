@@ -14,10 +14,51 @@ pub struct FnResource<Fun, Ret, Args> {
 
 include!(concat!(env!("OUT_DIR"), "/fn_resource_impl.rs"));
 
+impl<Fun, Ret> FnResource<Fun, Ret, ()>
+where
+    Fun: Fn() -> Ret,
+{
+    pub fn call<'f>(&self, _resources: &Resources) -> Ret {
+        (self.func)()
+    }
+
+    pub fn try_call<'f>(&self, _resources: &Resources) -> Result<Ret, BorrowFail> {
+        let ret_value = (self.func)();
+        Ok(ret_value)
+    }
+}
+
+impl<Fun, Ret> FnRes for FnResource<Fun, Ret, ()>
+where
+    Fun: Fn() -> Ret,
+{
+    type Ret = Ret;
+
+    fn call<'f>(&self, resources: &Resources) -> Ret {
+        Self::call(self, resources)
+    }
+
+    fn try_call<'f>(&self, resources: &Resources) -> Result<Ret, BorrowFail> {
+        Self::try_call(self, resources)
+    }
+}
+
 /// Extension to return [`FnResource`] for a function.
 pub trait IntoFnResource<Fun, Ret, Args> {
     /// Returns the function wrapped as a `FnResource`.
     fn into_fn_resource(self) -> FnResource<Fun, Ret, Args>;
+}
+
+impl<Fun, Ret> IntoFnResource<Fun, Ret, ()> for Fun
+where
+    Fun: Fn() -> Ret,
+{
+    fn into_fn_resource(self) -> FnResource<Fun, Ret, ()> {
+        FnResource {
+            func: self,
+            marker: PhantomData,
+        }
+    }
 }
 
 impl<Fun, Ret, A> IntoFnResource<Fun, Ret, (A,)> for Fun
