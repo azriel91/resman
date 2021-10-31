@@ -2,7 +2,7 @@
 name = "resman"
 version = "0.8.0"
 authors = ["Azriel Hoh <azriel91@gmail.com>"]
-edition = "2018"
+edition = "2021"
 description = "Runtime managed resource borrowing."
 repository = "https://github.com/azriel91/resman"
 documentation = "https://docs.rs/resman/"

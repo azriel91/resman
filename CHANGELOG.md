@@ -3,6 +3,7 @@
 ## 0.8.0 (2021-10-31)
 
 * Support `FnRes` for functions with zero arguments.
+* Update to Rust 2021 edition.
 
 ## 0.7.0 (2021-10-25)
 
