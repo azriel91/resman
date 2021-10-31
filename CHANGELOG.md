@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.8.0 (2021-10-31)
+
+* Support `FnRes` for functions with zero arguments.
+
 ## 0.7.0 (2021-10-25)
 
 * Allow dynamic functions invocation through `Box<dyn FnRes>`. ([#3], [#4])
