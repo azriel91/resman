@@ -159,6 +159,12 @@
 //! Use [`FnRes::try_call`] for a non-panicking version, which will return a
 //! [`BorrowFail`] error if there is an overlapping borrow conflict at runtime.
 //!
+//! #### `"fn_meta"`:
+//!
+//! Adds [`FnMeta`] as an implied trait to [`FnRes`]. This means function
+//! metadata can be queried for any `FnRes`.
+//!
+//!
 //! ## See Also
 //!
 //! * [`anymap`]: Map of any type, without multiple mutable borrows.
@@ -170,6 +176,8 @@
 //! [`mopa`]: https://github.com/chris-morgan/mopa
 //! [`rt_map`]: https://github.com/azriel91/rt_map
 //! [`shred`]: https://github.com/amethyst/shred
+//!
+//! [`FnMeta`]: fn_meta::FnMeta
 
 pub use crate::{
     entry::Entry, r#ref::Ref, ref_mut::RefMut, resource::Resource, resources::Resources,

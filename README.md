@@ -167,6 +167,11 @@ the same time when using [`FnRes::call`], otherwise it will panic.
 Use [`FnRes::try_call`] for a non-panicking version, which will return a
 [`BorrowFail`] error if there is an overlapping borrow conflict at runtime.
 
+#### `"fn_meta"`:
+
+Adds [`FnMeta`] as an implied trait to [`FnRes`]. This means function metadata can be queried for any `FnRes`.
+
+
 ## See Also
 
 * [`anymap`]: Map of any type, without multiple mutable borrows.
@@ -194,3 +199,9 @@ Unless you explicitly state otherwise, any contribution intentionally submitted 
 
 [LICENSE-APACHE]: LICENSE-APACHE
 [LICENSE-MIT]: LICENSE-MIT
+
+[`BorrowFail`]: https://docs.rs/resman/latest/resman/enum.BorrowFail.html
+[`FnMeta`]: https://docs.rs/fn_meta/latest/fn_meta/trait.FnMeta.html
+[`FnRes`]: https://docs.rs/resman/latest/resman/trait.FnRes.html
+[`FnRes::call`]: https://docs.rs/resman/latest/resman/trait.FnRes.html#tymethod.call
+[`FnRes::try_call`]: https://docs.rs/resman/latest/resman/trait.FnRes.html#tymethod.try_call
