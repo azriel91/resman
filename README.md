@@ -26,12 +26,12 @@ following differences:
 Add the following to `Cargo.toml`
 
 ```toml
-resman = "0.8.0"
+resman = "0.9.0"
 
 # or
-resman = { version = "0.8.0", features = ["debug"] }
-resman = { version = "0.8.0", features = ["fn_res"] }
-resman = { version = "0.8.0", features = ["fn_res", "fn_meta"] }
+resman = { version = "0.9.0", features = ["debug"] }
+resman = { version = "0.9.0", features = ["fn_res"] }
+resman = { version = "0.9.0", features = ["fn_res", "fn_meta"] }
 ```
 
 In code:
