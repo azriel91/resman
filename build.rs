@@ -28,7 +28,10 @@ fn main() {
     generate_impls_for_n_args::<_, 4>(&mut write_fn);
     generate_impls_for_n_args::<_, 5>(&mut write_fn);
     generate_impls_for_n_args::<_, 6>(&mut write_fn);
+
+    #[cfg(feature = "high_arg_count")]
     generate_impls_for_n_args::<_, 7>(&mut write_fn);
+    #[cfg(feature = "high_arg_count")]
     generate_impls_for_n_args::<_, 8>(&mut write_fn);
 
     #[cfg(feature = "fn_res")]

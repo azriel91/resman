@@ -164,6 +164,15 @@
 //! Adds [`FnMeta`] as an implied trait to [`FnRes`]. This means function
 //! metadata can be queried for any `FnRes`.
 //!
+//! #### `"high_arg_count"`:
+//!
+//! Raises the number of arguments that [`FnRes`], [`IntoFnRes`], and
+//! [`IntoFnResource`] are implemented for from 6 to 8.
+//!
+//! This is feature gated because compilation time increasing significantly with
+//! higher numbers of arguments -- as much as from 4 seconds for 6 arguments
+//! to 26 seconds for 8 arguments.
+//!
 //!
 //! ## See Also
 //!

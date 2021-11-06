@@ -164,6 +164,7 @@ where
     }
 }
 
+#[cfg(feature = "high_arg_count")]
 impl<Fun, Ret, A, B, C, D, E, F, G> IntoFnResource<Fun, Ret, (A, B, C, D, E, F, G)> for Fun
 where
     Fun: Fn(A, B, C, D, E, F, G) -> Ret + 'static,
@@ -178,6 +179,7 @@ where
     }
 }
 
+#[cfg(feature = "high_arg_count")]
 impl<Fun, Ret, A, B, C, D, E, F, G, H> IntoFnResource<Fun, Ret, (A, B, C, D, E, F, G, H)> for Fun
 where
     Fun: Fn(A, B, C, D, E, F, G, H) -> Ret + 'static,
@@ -517,6 +519,7 @@ mod tests {
         assert_eq!(5, sum);
     }
 
+    #[cfg(feature = "high_arg_count")]
     #[test]
     fn write_2_read_2_write_2_read_1() {
         let fn_res = f_w2_r2_w2_r1.into_fn_resource();
@@ -541,7 +544,7 @@ mod tests {
         assert_eq!(25, sum);
     }
 
-    #[cfg(feature = "fn_meta")]
+    #[cfg(all(feature = "fn_meta", feature = "high_arg_count"))]
     #[test]
     fn fn_meta_integration() {
         use std::any::TypeId;
@@ -653,6 +656,7 @@ mod tests {
 
         s0.0 + s1.0 + s2.0
     }
+    #[cfg(feature = "high_arg_count")]
     fn f_w2_r2_w2_r1(
         s0: &mut S0,
         s1: &mut S1,
@@ -682,6 +686,7 @@ mod tests {
     struct S4(usize);
     #[derive(Debug)]
     struct S5(usize);
+    #[cfg(feature = "high_arg_count")]
     #[derive(Debug)]
     struct S6(usize);
 }

@@ -171,6 +171,15 @@ Use [`FnRes::try_call`] for a non-panicking version, which will return a
 
 Adds [`FnMeta`] as an implied trait to [`FnRes`]. This means function metadata can be queried for any `FnRes`.
 
+#### `"high_arg_count"`:
+
+Raises the number of arguments that [`FnRes`], [`IntoFnRes`], and
+[`IntoFnResource`] are implemented for from 6 to 8.
+
+This is feature gated because compilation time increasing significantly with
+higher numbers of arguments -- as much as from 4 seconds for 6 arguments
+to 26 seconds for 8 arguments.
+
 
 ## See Also
 
@@ -202,6 +211,8 @@ Unless you explicitly state otherwise, any contribution intentionally submitted 
 
 [`BorrowFail`]: https://docs.rs/resman/latest/resman/enum.BorrowFail.html
 [`FnMeta`]: https://docs.rs/fn_meta/latest/fn_meta/trait.FnMeta.html
+[`IntoFnRes`]: https://docs.rs/resman/latest/resman/trait.IntoFnRes.html
+[`IntoFnResource`]: https://docs.rs/resman/latest/resman/trait.IntoFnResource.html
 [`FnRes`]: https://docs.rs/resman/latest/resman/trait.FnRes.html
 [`FnRes::call`]: https://docs.rs/resman/latest/resman/trait.FnRes.html#tymethod.call
 [`FnRes::try_call`]: https://docs.rs/resman/latest/resman/trait.FnRes.html#tymethod.try_call

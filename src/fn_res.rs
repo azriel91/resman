@@ -78,7 +78,6 @@ mod tests {
             f_w1_r1.into_fn_res(),
             f_r1_w1_r1.into_fn_res(),
             f_w1_r1_w1.into_fn_res(),
-            f_w2_r2_w2_r1.into_fn_res(),
             // closure
             (|s0: &S0, s1: &mut S1| {
                 s1.0 += 1;
@@ -94,14 +93,13 @@ mod tests {
         resources.insert(S3(3));
         resources.insert(S4(4));
         resources.insert(S5(5));
-        resources.insert(S6(6));
 
         let sum = fn_reses
             .iter()
             .fold(0, |sum, fn_res| sum + fn_res.call(&resources));
 
-        assert_eq!(9, resources.borrow::<S0>().0);
-        assert_eq!(267, sum);
+        assert_eq!(8, resources.borrow::<S0>().0);
+        assert_eq!(214, sum);
     }
 
     #[test]
@@ -123,7 +121,6 @@ mod tests {
             f_w1_r1.into_fn_res(),
             f_r1_w1_r1.into_fn_res(),
             f_w1_r1_w1.into_fn_res(),
-            f_w2_r2_w2_r1.into_fn_res(),
             // closures
             // zero args
             (|| 0usize).into_fn_res(),
@@ -142,14 +139,13 @@ mod tests {
         resources.insert(S3(3));
         resources.insert(S4(4));
         resources.insert(S5(5));
-        resources.insert(S6(6));
 
         let sum = fn_reses.iter().try_fold(0, |sum, fn_res| {
             fn_res.try_call(&resources).map(|ret| sum + ret)
         })?;
 
-        assert_eq!(9, resources.borrow::<S0>().0);
-        assert_eq!(267, sum);
+        assert_eq!(8, resources.borrow::<S0>().0);
+        assert_eq!(214, sum);
 
         Ok(())
     }
@@ -183,6 +179,22 @@ mod tests {
     #[cfg(feature = "fn_meta")]
     #[test]
     fn fn_meta_integration() {
+        use std::any::TypeId;
+
+        let fn_res = f_w1_r1_w1.into_fn_res();
+        let borrows = fn_res.borrows();
+        let borrow_muts = fn_res.borrow_muts();
+
+        assert_eq!(&[TypeId::of::<S1>()], borrows.as_slice());
+        assert_eq!(
+            &[TypeId::of::<S0>(), TypeId::of::<S2>(),],
+            borrow_muts.as_slice()
+        );
+    }
+
+    #[cfg(all(feature = "fn_meta", feature = "high_arg_count"))]
+    #[test]
+    fn fn_meta_integration_high_arg_count() {
         use std::any::TypeId;
 
         let fn_res = f_w2_r2_w2_r1.into_fn_res();
@@ -290,6 +302,7 @@ mod tests {
 
         s0.0 + s1.0 + s2.0
     }
+    #[cfg(feature = "high_arg_count")]
     fn f_w2_r2_w2_r1(
         s0: &mut S0,
         s1: &mut S1,
@@ -319,6 +332,7 @@ mod tests {
     struct S4(usize);
     #[derive(Debug)]
     struct S5(usize);
+    #[cfg(feature = "high_arg_count")]
     #[derive(Debug)]
     struct S6(usize);
 }

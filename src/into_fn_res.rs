@@ -104,6 +104,7 @@ where
     }
 }
 
+#[cfg(feature = "high_arg_count")]
 impl<Fun, Ret, A, B, C, D, E, F, G> IntoFnRes<Fun, Ret, (A, B, C, D, E, F, G)> for Fun
 where
     Fun: Fn(A, B, C, D, E, F, G) -> Ret + 'static,
@@ -122,6 +123,7 @@ where
     }
 }
 
+#[cfg(feature = "high_arg_count")]
 impl<Fun, Ret, A, B, C, D, E, F, G, H> IntoFnRes<Fun, Ret, (A, B, C, D, E, F, G, H)> for Fun
 where
     Fun: Fn(A, B, C, D, E, F, G, H) -> Ret + 'static,
