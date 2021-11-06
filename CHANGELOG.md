@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.9.0 (2021-11-06)
+
+* Add `"fn_meta"` feature which requires `FnRes: FnMeta`.
+* Implement `FnRes` for `Box<T>` where `T: FnRes`.
+
 ## 0.8.0 (2021-10-31)
 
 * Support `FnRes` for functions with zero arguments.
