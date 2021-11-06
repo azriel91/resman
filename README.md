@@ -31,6 +31,7 @@ resman = "0.8.0"
 # or
 resman = { version = "0.8.0", features = ["debug"] }
 resman = { version = "0.8.0", features = ["fn_res"] }
+resman = { version = "0.8.0", features = ["fn_res", "fn_meta"] }
 ```
 
 In code:

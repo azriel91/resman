@@ -12,11 +12,19 @@ pub struct FnResource<Fun, Ret, Args> {
     marker: PhantomData<(Fun, Ret, Args)>,
 }
 
+// Unfortuantely we have to `include!` instead of use a `#[path]` attribute.
+// Pending: <https://github.com/rust-lang/rust/issues/48250>
 include!(concat!(env!("OUT_DIR"), "/fn_resource_impl.rs"));
+
+// Unfortuantely we have to `include!` instead of use a `#[path]` attribute.
+// Pending: <https://github.com/rust-lang/rust/issues/48250>
+#[cfg(feature = "fn_meta")]
+include!(concat!(env!("OUT_DIR"), "/fn_resource_meta_impl.rs"));
 
 impl<Fun, Ret> FnResource<Fun, Ret, ()>
 where
-    Fun: Fn() -> Ret,
+    Fun: Fn() -> Ret + 'static,
+    Ret: 'static,
 {
     pub fn call(&self, _resources: &Resources) -> Ret {
         (self.func)()
@@ -28,9 +36,25 @@ where
     }
 }
 
+#[cfg(feature = "fn_meta")]
+impl<Fun, Ret> fn_meta::FnMeta for FnResource<Fun, Ret, ()>
+where
+    Fun: Fn() -> Ret + 'static,
+    Ret: 'static,
+{
+    fn borrows(&self) -> fn_meta::TypeIds {
+        fn_meta::FnMetaExt::meta(&self.func).borrows()
+    }
+
+    fn borrow_muts(&self) -> fn_meta::TypeIds {
+        fn_meta::FnMetaExt::meta(&self.func).borrow_muts()
+    }
+}
+
 impl<Fun, Ret> FnRes for FnResource<Fun, Ret, ()>
 where
-    Fun: Fn() -> Ret,
+    Fun: Fn() -> Ret + 'static,
+    Ret: 'static,
 {
     type Ret = Ret;
 
@@ -51,7 +75,8 @@ pub trait IntoFnResource<Fun, Ret, Args> {
 
 impl<Fun, Ret> IntoFnResource<Fun, Ret, ()> for Fun
 where
-    Fun: Fn() -> Ret,
+    Fun: Fn() -> Ret + 'static,
+    Ret: 'static,
 {
     fn into_fn_resource(self) -> FnResource<Fun, Ret, ()> {
         FnResource {
@@ -63,7 +88,8 @@ where
 
 impl<Fun, Ret, A> IntoFnResource<Fun, Ret, (A,)> for Fun
 where
-    Fun: Fn(A) -> Ret,
+    Fun: Fn(A) -> Ret + 'static,
+    Ret: 'static,
 {
     fn into_fn_resource(self) -> FnResource<Fun, Ret, (A,)> {
         FnResource {
@@ -75,7 +101,8 @@ where
 
 impl<Fun, Ret, A, B> IntoFnResource<Fun, Ret, (A, B)> for Fun
 where
-    Fun: Fn(A, B) -> Ret,
+    Fun: Fn(A, B) -> Ret + 'static,
+    Ret: 'static,
 {
     fn into_fn_resource(self) -> FnResource<Fun, Ret, (A, B)> {
         FnResource {
@@ -87,7 +114,8 @@ where
 
 impl<Fun, Ret, A, B, C> IntoFnResource<Fun, Ret, (A, B, C)> for Fun
 where
-    Fun: Fn(A, B, C) -> Ret,
+    Fun: Fn(A, B, C) -> Ret + 'static,
+    Ret: 'static,
 {
     fn into_fn_resource(self) -> FnResource<Fun, Ret, (A, B, C)> {
         FnResource {
@@ -99,7 +127,8 @@ where
 
 impl<Fun, Ret, A, B, C, D> IntoFnResource<Fun, Ret, (A, B, C, D)> for Fun
 where
-    Fun: Fn(A, B, C, D) -> Ret,
+    Fun: Fn(A, B, C, D) -> Ret + 'static,
+    Ret: 'static,
 {
     fn into_fn_resource(self) -> FnResource<Fun, Ret, (A, B, C, D)> {
         FnResource {
@@ -111,7 +140,8 @@ where
 
 impl<Fun, Ret, A, B, C, D, E> IntoFnResource<Fun, Ret, (A, B, C, D, E)> for Fun
 where
-    Fun: Fn(A, B, C, D, E) -> Ret,
+    Fun: Fn(A, B, C, D, E) -> Ret + 'static,
+    Ret: 'static,
 {
     fn into_fn_resource(self) -> FnResource<Fun, Ret, (A, B, C, D, E)> {
         FnResource {
@@ -123,7 +153,8 @@ where
 
 impl<Fun, Ret, A, B, C, D, E, F> IntoFnResource<Fun, Ret, (A, B, C, D, E, F)> for Fun
 where
-    Fun: Fn(A, B, C, D, E, F) -> Ret,
+    Fun: Fn(A, B, C, D, E, F) -> Ret + 'static,
+    Ret: 'static,
 {
     fn into_fn_resource(self) -> FnResource<Fun, Ret, (A, B, C, D, E, F)> {
         FnResource {
@@ -135,10 +166,25 @@ where
 
 impl<Fun, Ret, A, B, C, D, E, F, G> IntoFnResource<Fun, Ret, (A, B, C, D, E, F, G)> for Fun
 where
-    Fun: Fn(A, B, C, D, E, F, G) -> Ret,
+    Fun: Fn(A, B, C, D, E, F, G) -> Ret + 'static,
+    Ret: 'static,
 {
     #[allow(clippy::type_complexity)]
     fn into_fn_resource(self) -> FnResource<Fun, Ret, (A, B, C, D, E, F, G)> {
+        FnResource {
+            func: self,
+            marker: PhantomData,
+        }
+    }
+}
+
+impl<Fun, Ret, A, B, C, D, E, F, G, H> IntoFnResource<Fun, Ret, (A, B, C, D, E, F, G, H)> for Fun
+where
+    Fun: Fn(A, B, C, D, E, F, G, H) -> Ret + 'static,
+    Ret: 'static,
+{
+    #[allow(clippy::type_complexity)]
+    fn into_fn_resource(self) -> FnResource<Fun, Ret, (A, B, C, D, E, F, G, H)> {
         FnResource {
             func: self,
             marker: PhantomData,
@@ -493,6 +539,32 @@ mod tests {
         assert_eq!(6, resources.borrow::<S5>().0);
         assert_eq!(6, resources.borrow::<S6>().0);
         assert_eq!(25, sum);
+    }
+
+    #[cfg(feature = "fn_meta")]
+    #[test]
+    fn fn_meta_integration() {
+        use std::any::TypeId;
+
+        use fn_meta::FnMeta;
+
+        let fn_res = f_w2_r2_w2_r1.into_fn_resource();
+        let borrows = fn_res.borrows();
+        let borrow_muts = fn_res.borrow_muts();
+
+        assert_eq!(
+            &[TypeId::of::<S2>(), TypeId::of::<S3>(), TypeId::of::<S6>()],
+            borrows.as_slice()
+        );
+        assert_eq!(
+            &[
+                TypeId::of::<S0>(),
+                TypeId::of::<S1>(),
+                TypeId::of::<S4>(),
+                TypeId::of::<S5>()
+            ],
+            borrow_muts.as_slice()
+        );
     }
 
     fn f_r1(s0: &S0) -> usize {

@@ -1,12 +1,15 @@
+use std::ops::Deref;
+
 use rt_map::BorrowFail;
 
-use crate::{FnResource, IntoFnResource, Resources};
+use crate::Resources;
 
 /// Function that gets its arguments / parameters from a `Resources` map.
 ///
 /// This allows consumers of this library to hold onto multiple *resource
 /// functions* as `Box<dyn FnRes>`, even though their arguments may be
 /// different.
+#[cfg(not(feature = "fn_meta"))]
 pub trait FnRes {
     /// Return type of the function.
     type Ret;
@@ -18,134 +21,43 @@ pub trait FnRes {
     fn try_call(&self, resources: &Resources) -> Result<Self::Ret, BorrowFail>;
 }
 
-/// Extension to return `Box<dyn FnRes>` for a function.
-pub trait IntoFnRes<Fun, Ret, Args> {
-    /// Returns the function wrapped as a `Box<dyn FnRes>`.
-    fn into_fn_res(self) -> Box<dyn FnRes<Ret = Ret>>;
-}
-
-impl<Fun, Ret> IntoFnRes<Fun, Ret, ()> for Fun
+impl<T, Ret> FnRes for Box<T>
 where
-    Fun: Fn() -> Ret + 'static,
-    Ret: 'static,
-    FnResource<Fun, Ret, ()>: FnRes<Ret = Ret>,
+    T: FnRes<Ret = Ret> + ?Sized,
 {
-    fn into_fn_res(self) -> Box<dyn FnRes<Ret = Ret>> {
-        Box::new(self.into_fn_resource())
+    type Ret = Ret;
+
+    fn call(&self, resources: &Resources) -> Self::Ret {
+        self.deref().call(resources)
+    }
+
+    fn try_call(&self, resources: &Resources) -> Result<Self::Ret, BorrowFail> {
+        self.deref().try_call(resources)
     }
 }
 
-impl<Fun, Ret, A> IntoFnRes<Fun, Ret, (A,)> for Fun
-where
-    Fun: Fn(A) -> Ret + 'static,
-    Ret: 'static,
-    A: 'static,
-    FnResource<Fun, Ret, (A,)>: FnRes<Ret = Ret>,
-{
-    fn into_fn_res(self) -> Box<dyn FnRes<Ret = Ret>> {
-        Box::new(self.into_fn_resource())
-    }
-}
+/// Function that gets its arguments / parameters from a `Resources` map.
+///
+/// This allows consumers of this library to hold onto multiple *resource
+/// functions* as `Box<dyn FnRes>`, even though their arguments may be
+/// different.
+#[cfg(feature = "fn_meta")]
+pub trait FnRes: fn_meta::FnMeta {
+    /// Return type of the function.
+    type Ret;
 
-impl<Fun, Ret, A, B> IntoFnRes<Fun, Ret, (A, B)> for Fun
-where
-    Fun: Fn(A, B) -> Ret + 'static,
-    Ret: 'static,
-    A: 'static,
-    B: 'static,
-    FnResource<Fun, Ret, (A, B)>: FnRes<Ret = Ret>,
-{
-    fn into_fn_res(self) -> Box<dyn FnRes<Ret = Ret>> {
-        Box::new(self.into_fn_resource())
-    }
-}
+    /// Runs the function.
+    fn call(&self, resources: &Resources) -> Self::Ret;
 
-impl<Fun, Ret, A, B, C> IntoFnRes<Fun, Ret, (A, B, C)> for Fun
-where
-    Fun: Fn(A, B, C) -> Ret + 'static,
-    Ret: 'static,
-    A: 'static,
-    B: 'static,
-    C: 'static,
-    FnResource<Fun, Ret, (A, B, C)>: FnRes<Ret = Ret>,
-{
-    fn into_fn_res(self) -> Box<dyn FnRes<Ret = Ret>> {
-        Box::new(self.into_fn_resource())
-    }
-}
-
-impl<Fun, Ret, A, B, C, D> IntoFnRes<Fun, Ret, (A, B, C, D)> for Fun
-where
-    Fun: Fn(A, B, C, D) -> Ret + 'static,
-    Ret: 'static,
-    A: 'static,
-    B: 'static,
-    C: 'static,
-    D: 'static,
-    FnResource<Fun, Ret, (A, B, C, D)>: FnRes<Ret = Ret>,
-{
-    fn into_fn_res(self) -> Box<dyn FnRes<Ret = Ret>> {
-        Box::new(self.into_fn_resource())
-    }
-}
-
-impl<Fun, Ret, A, B, C, D, E> IntoFnRes<Fun, Ret, (A, B, C, D, E)> for Fun
-where
-    Fun: Fn(A, B, C, D, E) -> Ret + 'static,
-    Ret: 'static,
-    A: 'static,
-    B: 'static,
-    C: 'static,
-    D: 'static,
-    E: 'static,
-    FnResource<Fun, Ret, (A, B, C, D, E)>: FnRes<Ret = Ret>,
-{
-    fn into_fn_res(self) -> Box<dyn FnRes<Ret = Ret>> {
-        Box::new(self.into_fn_resource())
-    }
-}
-
-impl<Fun, Ret, A, B, C, D, E, F> IntoFnRes<Fun, Ret, (A, B, C, D, E, F)> for Fun
-where
-    Fun: Fn(A, B, C, D, E, F) -> Ret + 'static,
-    Ret: 'static,
-    A: 'static,
-    B: 'static,
-    C: 'static,
-    D: 'static,
-    E: 'static,
-    F: 'static,
-    FnResource<Fun, Ret, (A, B, C, D, E, F)>: FnRes<Ret = Ret>,
-{
-    fn into_fn_res(self) -> Box<dyn FnRes<Ret = Ret>> {
-        Box::new(self.into_fn_resource())
-    }
-}
-
-impl<Fun, Ret, A, B, C, D, E, F, G> IntoFnRes<Fun, Ret, (A, B, C, D, E, F, G)> for Fun
-where
-    Fun: Fn(A, B, C, D, E, F, G) -> Ret + 'static,
-    Ret: 'static,
-    A: 'static,
-    B: 'static,
-    C: 'static,
-    D: 'static,
-    E: 'static,
-    F: 'static,
-    G: 'static,
-    FnResource<Fun, Ret, (A, B, C, D, E, F, G)>: FnRes<Ret = Ret>,
-{
-    fn into_fn_res(self) -> Box<dyn FnRes<Ret = Ret>> {
-        Box::new(self.into_fn_resource())
-    }
+    /// Runs the function.
+    fn try_call(&self, resources: &Resources) -> Result<Self::Ret, BorrowFail>;
 }
 
 #[cfg(test)]
 mod tests {
     use rt_map::BorrowFail;
 
-    use super::IntoFnRes;
-    use crate::Resources;
+    use crate::{IntoFnRes, Resources};
 
     #[test]
     fn multiple_fn_usage() {
@@ -266,6 +178,30 @@ mod tests {
         assert_eq!(Err(BorrowFail::BorrowConflictMut), result);
 
         Ok(())
+    }
+
+    #[cfg(feature = "fn_meta")]
+    #[test]
+    fn fn_meta_integration() {
+        use std::any::TypeId;
+
+        let fn_res = f_w2_r2_w2_r1.into_fn_res();
+        let borrows = fn_res.borrows();
+        let borrow_muts = fn_res.borrow_muts();
+
+        assert_eq!(
+            &[TypeId::of::<S2>(), TypeId::of::<S3>(), TypeId::of::<S6>()],
+            borrows.as_slice()
+        );
+        assert_eq!(
+            &[
+                TypeId::of::<S0>(),
+                TypeId::of::<S1>(),
+                TypeId::of::<S4>(),
+                TypeId::of::<S5>()
+            ],
+            borrow_muts.as_slice()
+        );
     }
 
     fn f_r1(s0: &S0) -> usize {

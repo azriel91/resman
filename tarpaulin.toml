@@ -9,6 +9,9 @@ features = "fn_res"
 [debug_fn_res]
 features = "debug fn_res"
 
+[fn_meta]
+features = "debug fn_res fn_meta"
+
 [report]
 out = ["Html", "Xml"]
 output-dir = "target/tarpaulin"

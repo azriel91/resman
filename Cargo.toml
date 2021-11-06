@@ -11,10 +11,11 @@ keywords = ["data", "share", "lock"]
 license = "MIT OR Apache-2.0"
 
 [package.metadata.docs.rs]
-features = ["debug", "fn_res"]
+features = ["debug", "fn_res", "fn_meta"]
 
 [dependencies]
 downcast-rs = "1.2.0"
+fn_meta = { version = "0.3.0", optional = true, features = ["fn_meta_ext"] }
 rt_map = "0.5.0"
 
 [features]

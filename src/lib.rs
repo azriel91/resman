@@ -177,6 +177,9 @@ pub use crate::{
 
 pub use rt_map::BorrowFail;
 
+#[cfg(feature = "fn_meta")]
+pub use fn_meta;
+
 mod entry;
 mod r#ref;
 mod ref_mut;
@@ -185,11 +188,14 @@ mod resources;
 
 #[cfg(feature = "fn_res")]
 pub use crate::{
-    fn_res::{FnRes, IntoFnRes},
+    fn_res::FnRes,
     fn_resource::{FnResource, IntoFnResource},
+    into_fn_res::IntoFnRes,
 };
 
 #[cfg(feature = "fn_res")]
 mod fn_res;
 #[cfg(feature = "fn_res")]
 mod fn_resource;
+#[cfg(feature = "fn_res")]
+mod into_fn_res;
