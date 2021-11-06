@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.10.0 (2021-11-07)
+
+* Feature gate 7 and 8 arguments behind `"high_arg_count"` feature.
+
 ## 0.9.0 (2021-11-06)
 
 * Add `"fn_meta"` feature which requires `FnRes: FnMeta`.
