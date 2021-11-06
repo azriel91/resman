@@ -12,6 +12,9 @@ features = "debug fn_res"
 [fn_meta]
 features = "debug fn_res fn_meta"
 
+[high_arg_count]
+features = "debug fn_res fn_meta high_arg_count"
+
 [report]
 out = ["Html", "Xml"]
 output-dir = "target/tarpaulin"
