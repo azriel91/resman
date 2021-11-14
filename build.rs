@@ -12,12 +12,27 @@ fn main() {
 
     #[cfg(feature = "fn_res")]
     let mut fn_resource_impl = common::open_impl_file(&out_dir, "fn_resource_impl.rs");
+    #[cfg(feature = "fn_res_once")]
+    let mut fn_res_once_impl = common::open_impl_file(&out_dir, "fn_res_once_impl.rs");
+    #[cfg(feature = "fn_res_mut")]
+    let mut fn_res_mut_impl = common::open_impl_file(&out_dir, "fn_res_mut_impl.rs");
+    #[cfg(feature = "fn_res")]
+    let mut fn_res_impl = common::open_impl_file(&out_dir, "fn_res_impl.rs");
+
     #[cfg(feature = "fn_meta")]
     let mut fn_resource_meta_impl = common::open_impl_file(&out_dir, "fn_resource_meta_impl.rs");
 
     let mut write_fn = |arg_exprs: ArgExprs<'_>| {
         #[cfg(feature = "fn_res")]
         fn_resource_impl::write_fn_resource_impl(&mut fn_resource_impl, arg_exprs);
+
+        #[cfg(feature = "fn_res_once")]
+        fn_res_once_impl::write_fn_res_once_impl(&mut fn_res_once_impl, arg_exprs);
+        #[cfg(feature = "fn_res_mut")]
+        fn_res_mut_impl::write_fn_res_mut_impl(&mut fn_res_mut_impl, arg_exprs);
+        #[cfg(feature = "fn_res")]
+        fn_res_impl::write_fn_res_impl(&mut fn_res_impl, arg_exprs);
+
         #[cfg(feature = "fn_meta")]
         fn_resource_meta_impl::write_fn_resource_meta_impl(&mut fn_resource_meta_impl, arg_exprs);
     };
@@ -315,7 +330,72 @@ mod fn_resource_impl {
             resource_arg_vars,
         } = arg_exprs;
 
-        // let mut impls_buffer = String::with_capacity(N * (256 + N * 64));
+        #[cfg(feature = "fn_res_once")]
+        write!(
+            fn_resource_impl,
+            r#"
+impl<Fun, Ret, {args_csv}> FnResource<Fun, Ret, ({arg_refs_csv})>
+where
+    Fun: FnOnce({arg_refs_csv}) -> Ret + 'static,
+    Ret: 'static,
+    {arg_bounds_list}
+{{
+    pub fn call_once(self, resources: &Resources) -> Ret {{
+        {resource_arg_borrows}
+
+        (self.func)({resource_arg_vars})
+    }}
+
+    pub fn try_call_once(self, resources: &Resources) -> Result<Ret, BorrowFail> {{
+        {resource_arg_try_borrows}
+
+        let ret_value = (self.func)({resource_arg_vars});
+        Ok(ret_value)
+    }}
+}}
+"#,
+            args_csv = args_csv,
+            arg_refs_csv = arg_refs_csv,
+            arg_bounds_list = arg_bounds_list,
+            resource_arg_borrows = resource_arg_borrows,
+            resource_arg_try_borrows = resource_arg_try_borrows,
+            resource_arg_vars = resource_arg_vars,
+        )
+        .expect("Failed to write to fn_resource_impl.rs");
+
+        #[cfg(feature = "fn_res_mut")]
+        write!(
+            fn_resource_impl,
+            r#"
+impl<Fun, Ret, {args_csv}> FnResource<Fun, Ret, ({arg_refs_csv})>
+where
+    Fun: FnMut({arg_refs_csv}) -> Ret + 'static,
+    Ret: 'static,
+    {arg_bounds_list}
+{{
+    pub fn call_mut(&mut self, resources: &Resources) -> Ret {{
+        {resource_arg_borrows}
+
+        (self.func)({resource_arg_vars})
+    }}
+
+    pub fn try_call_mut(&mut self, resources: &Resources) -> Result<Ret, BorrowFail> {{
+        {resource_arg_try_borrows}
+
+        let ret_value = (self.func)({resource_arg_vars});
+        Ok(ret_value)
+    }}
+}}
+"#,
+            args_csv = args_csv,
+            arg_refs_csv = arg_refs_csv,
+            arg_bounds_list = arg_bounds_list,
+            resource_arg_borrows = resource_arg_borrows,
+            resource_arg_try_borrows = resource_arg_try_borrows,
+            resource_arg_vars = resource_arg_vars,
+        )
+        .expect("Failed to write to fn_resource_impl.rs");
+
         write!(
             fn_resource_impl,
             r#"
@@ -338,15 +418,145 @@ where
         Ok(ret_value)
     }}
 }}
+"#,
+            args_csv = args_csv,
+            arg_refs_csv = arg_refs_csv,
+            arg_bounds_list = arg_bounds_list,
+            resource_arg_borrows = resource_arg_borrows,
+            resource_arg_try_borrows = resource_arg_try_borrows,
+            resource_arg_vars = resource_arg_vars,
+        )
+        .expect("Failed to write to fn_resource_impl.rs");
+    }
+}
 
+#[cfg(feature = "fn_res_once")]
+mod fn_res_once_impl {
+    use std::{
+        fs::File,
+        io::{BufWriter, Write},
+    };
+
+    use super::common::ArgExprs;
+
+    pub fn write_fn_res_once_impl(fn_resource_impl: &mut BufWriter<File>, arg_exprs: ArgExprs<'_>) {
+        let ArgExprs {
+            args_csv,
+            arg_refs_csv,
+            arg_bounds_list,
+            ..
+        } = arg_exprs;
+
+        write!(
+            fn_resource_impl,
+            r#"
+impl<Fun, Ret, {args_csv}> FnResOnce for FnResource<Fun, Ret, ({arg_refs_csv})>
+where
+    Fun: FnOnce({arg_refs_csv}) -> Ret + 'static,
+    Ret: 'static,
+    {arg_bounds_list}
+{{
+    type Ret = Ret;
+
+    fn call_once(self, resources: &Resources) -> Ret {{
+        Self::call_once(self, resources)
+    }}
+
+    fn try_call_once(self, resources: &Resources) -> Result<Ret, BorrowFail> {{
+        Self::try_call_once(self, resources)
+    }}
+}}
+"#,
+            args_csv = args_csv,
+            arg_refs_csv = arg_refs_csv,
+            arg_bounds_list = arg_bounds_list,
+        )
+        .expect("Failed to write to fn_res_once_impl.rs");
+    }
+}
+
+#[cfg(feature = "fn_res_mut")]
+mod fn_res_mut_impl {
+    use std::{
+        fs::File,
+        io::{BufWriter, Write},
+    };
+
+    use super::common::ArgExprs;
+
+    pub fn write_fn_res_mut_impl(fn_resource_impl: &mut BufWriter<File>, arg_exprs: ArgExprs<'_>) {
+        let ArgExprs {
+            args_csv,
+            arg_refs_csv,
+            arg_bounds_list,
+            ..
+        } = arg_exprs;
+
+        #[cfg(not(feature = "fn_res_once"))]
+        let ret_type_str = "    type Ret = Ret;\n";
+        #[cfg(feature = "fn_res_once")]
+        let ret_type_str = "";
+
+        write!(
+            fn_resource_impl,
+            r#"
+impl<Fun, Ret, {args_csv}> FnResMut for FnResource<Fun, Ret, ({arg_refs_csv})>
+where
+    Fun: FnMut({arg_refs_csv}) -> Ret + 'static,
+    Ret: 'static,
+    {arg_bounds_list}
+{{
+{ret_type_str}
+    fn call_mut(&mut self, resources: &Resources) -> Ret {{
+        Self::call_mut(self, resources)
+    }}
+
+    fn try_call_mut(&mut self, resources: &Resources) -> Result<Ret, BorrowFail> {{
+        Self::try_call_mut(self, resources)
+    }}
+}}
+"#,
+            args_csv = args_csv,
+            arg_refs_csv = arg_refs_csv,
+            arg_bounds_list = arg_bounds_list,
+            ret_type_str = ret_type_str,
+        )
+        .expect("Failed to write to fn_res_mut_impl.rs");
+    }
+}
+
+#[cfg(feature = "fn_res")]
+mod fn_res_impl {
+    use std::{
+        fs::File,
+        io::{BufWriter, Write},
+    };
+
+    use super::common::ArgExprs;
+
+    pub fn write_fn_res_impl(fn_resource_impl: &mut BufWriter<File>, arg_exprs: ArgExprs<'_>) {
+        let ArgExprs {
+            args_csv,
+            arg_refs_csv,
+            arg_bounds_list,
+            ..
+        } = arg_exprs;
+
+        #[cfg(not(feature = "fn_res_mut"))]
+        let ret_type_str = "    type Ret = Ret;\n";
+        #[cfg(feature = "fn_res_mut")]
+        let ret_type_str = "";
+
+        write!(
+            fn_resource_impl,
+            r#"
 impl<Fun, Ret, {args_csv}> FnRes for FnResource<Fun, Ret, ({arg_refs_csv})>
 where
     Fun: Fn({arg_refs_csv}) -> Ret + 'static,
     Ret: 'static,
     {arg_bounds_list}
 {{
-    type Ret = Ret;
-
+{ret_type_str}
     fn call(&self, resources: &Resources) -> Ret {{
         Self::call(self, resources)
     }}
@@ -359,11 +569,9 @@ where
             args_csv = args_csv,
             arg_refs_csv = arg_refs_csv,
             arg_bounds_list = arg_bounds_list,
-            resource_arg_borrows = resource_arg_borrows,
-            resource_arg_try_borrows = resource_arg_try_borrows,
-            resource_arg_vars = resource_arg_vars,
+            ret_type_str = ret_type_str,
         )
-        .expect("Failed to write to fn_resource_impl.rs");
+        .expect("Failed to write to fn_res_impl.rs");
     }
 }
 
@@ -389,13 +597,12 @@ mod fn_resource_meta_impl {
             resource_arg_vars: _,
         } = arg_exprs;
 
-        // let mut impls_buffer = String::with_capacity(N * (256 + N * 64));
         write!(
             fn_resource_meta_impl,
             r#"
 impl<Fun, Ret, {args_csv}> fn_meta::FnMeta for FnResource<Fun, Ret, ({arg_refs_csv})>
 where
-    Fun: Fn({arg_refs_csv}) -> Ret + 'static,
+    Fun: FnOnce({arg_refs_csv}) -> Ret + 'static,
     Ret: 'static,
     {arg_bounds_list}
 {{

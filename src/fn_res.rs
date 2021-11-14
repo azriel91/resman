@@ -9,7 +9,7 @@ use crate::Resources;
 /// This allows consumers of this library to hold onto multiple *resource
 /// functions* as `Box<dyn FnRes>`, even though their arguments may be
 /// different.
-#[cfg(not(feature = "fn_meta"))]
+#[cfg(all(not(feature = "fn_res_mut"), not(feature = "fn_meta")))]
 pub trait FnRes {
     /// Return type of the function.
     type Ret;
@@ -21,9 +21,55 @@ pub trait FnRes {
     fn try_call(&self, resources: &Resources) -> Result<Self::Ret, BorrowFail>;
 }
 
+/// Function that gets its arguments / parameters from a `Resources` map.
+///
+/// This allows consumers of this library to hold onto multiple *resource
+/// functions* as `Box<dyn FnRes>`, even though their arguments may be
+/// different.
+#[cfg(all(feature = "fn_res_mut", not(feature = "fn_meta")))]
+pub trait FnRes: crate::FnResMut {
+    /// Runs the function.
+    fn call(&self, resources: &Resources) -> Self::Ret;
+
+    /// Runs the function.
+    fn try_call(&self, resources: &Resources) -> Result<Self::Ret, BorrowFail>;
+}
+
+/// Function that gets its arguments / parameters from a `Resources` map.
+///
+/// This allows consumers of this library to hold onto multiple *resource
+/// functions* as `Box<dyn FnRes>`, even though their arguments may be
+/// different.
+#[cfg(all(not(feature = "fn_res_mut"), feature = "fn_meta"))]
+pub trait FnRes: fn_meta::FnMeta {
+    /// Return type of the function.
+    type Ret;
+
+    /// Runs the function.
+    fn call(&self, resources: &Resources) -> Self::Ret;
+
+    /// Runs the function.
+    fn try_call(&self, resources: &Resources) -> Result<Self::Ret, BorrowFail>;
+}
+
+/// Function that gets its arguments / parameters from a `Resources` map.
+///
+/// This allows consumers of this library to hold onto multiple *resource
+/// functions* as `Box<dyn FnRes>`, even though their arguments may be
+/// different.
+#[cfg(all(feature = "fn_res_mut", feature = "fn_meta"))]
+pub trait FnRes: crate::FnResMut + fn_meta::FnMeta {
+    /// Runs the function.
+    fn call(&self, resources: &Resources) -> Self::Ret;
+
+    /// Runs the function.
+    fn try_call(&self, resources: &Resources) -> Result<Self::Ret, BorrowFail>;
+}
+
+#[cfg(not(feature = "fn_res_mut"))]
 impl<T, Ret> FnRes for Box<T>
 where
-    T: FnRes<Ret = Ret> + ?Sized,
+    T: FnRes<Ret = Ret>,
 {
     type Ret = Ret;
 
@@ -36,21 +82,18 @@ where
     }
 }
 
-/// Function that gets its arguments / parameters from a `Resources` map.
-///
-/// This allows consumers of this library to hold onto multiple *resource
-/// functions* as `Box<dyn FnRes>`, even though their arguments may be
-/// different.
-#[cfg(feature = "fn_meta")]
-pub trait FnRes: fn_meta::FnMeta {
-    /// Return type of the function.
-    type Ret;
+#[cfg(feature = "fn_res_mut")]
+impl<T, Ret> FnRes for Box<T>
+where
+    T: FnRes<Ret = Ret>,
+{
+    fn call(&self, resources: &Resources) -> Self::Ret {
+        self.deref().call(resources)
+    }
 
-    /// Runs the function.
-    fn call(&self, resources: &Resources) -> Self::Ret;
-
-    /// Runs the function.
-    fn try_call(&self, resources: &Resources) -> Result<Self::Ret, BorrowFail>;
+    fn try_call(&self, resources: &Resources) -> Result<Self::Ret, BorrowFail> {
+        self.deref().try_call(resources)
+    }
 }
 
 #[cfg(test)]

@@ -22,4 +22,6 @@ rt_map = "0.5.0"
 default = []
 debug = []
 fn_res = []
+fn_res_once = []
+fn_res_mut = []
 high_arg_count = ["fn_meta/high_arg_count"]

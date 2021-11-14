@@ -1,3 +1,5 @@
+#![cfg_attr(feature = "fn_res_once", feature(box_into_inner))]
+
 //! Runtime managed resource borrowing.
 //!
 //! This library provides a map that can store one of any type, as well as
@@ -215,4 +217,30 @@ mod fn_res;
 #[cfg(feature = "fn_res")]
 mod fn_resource;
 #[cfg(feature = "fn_res")]
+mod fn_resource_impl;
+#[cfg(feature = "fn_res")]
 mod into_fn_res;
+
+#[cfg(all(feature = "fn_res", feature = "fn_meta"))]
+mod fn_resource_meta_impl;
+
+#[cfg(feature = "fn_res_mut")]
+pub use crate::{fn_res_mut::FnResMut, into_fn_res_mut::IntoFnResMut};
+#[cfg(feature = "fn_res_mut")]
+mod fn_res_mut;
+#[cfg(feature = "fn_res_mut")]
+mod into_fn_res_mut;
+
+#[cfg(feature = "fn_res_once")]
+pub use crate::{fn_res_once::FnResOnce, into_fn_res_once::IntoFnResOnce};
+#[cfg(feature = "fn_res_once")]
+mod fn_res_once;
+#[cfg(feature = "fn_res_once")]
+mod into_fn_res_once;
+
+#[cfg(feature = "fn_res")]
+mod fn_res_impl;
+#[cfg(feature = "fn_res_mut")]
+mod fn_res_mut_impl;
+#[cfg(feature = "fn_res_once")]
+mod fn_res_once_impl;
