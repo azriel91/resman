@@ -113,7 +113,7 @@ jobs:
       - uses: actions-rs/cargo@v1
         with:
           command: test
-          args: --release --features "debug fn_res"
+          args: --release --features "debug fn_meta fn_res fn_res_mut"
 
   build_and_test_windows:
     name: Build and Test (Windows)
@@ -133,4 +133,4 @@ jobs:
       - uses: actions-rs/cargo@v1
         with:
           command: test
-          args: --release --features "debug fn_res"
+          args: --release --features "debug fn_meta fn_res fn_res_mut"
