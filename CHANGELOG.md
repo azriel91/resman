@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.11.0 (unreleased)
+
+* Add `"fn_res_mut"` feature, gating `FnResMut` and `IntoFnResMut`.
+* Add `"fn_res_once"` feature, gating `FnResOnce` and `IntoFnResOnce`.
+
 ## 0.10.0 (2021-11-07)
 
 * Feature gate 7 and 8 arguments behind `"high_arg_count"` feature.

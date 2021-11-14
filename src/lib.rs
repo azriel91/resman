@@ -1,3 +1,5 @@
+#![cfg_attr(feature = "fn_res_once", feature(box_into_inner))]
+
 //! Runtime managed resource borrowing.
 //!
 //! This library provides a map that can store one of any type, as well as
@@ -19,11 +21,17 @@
 //! Add the following to `Cargo.toml`
 //!
 //! ```toml
-//! resman = "0.10.0"
+//! resman = "0.11.0"
 //!
 //! # or
-//! resman = { version = "0.10.0", features = ["debug"] }
-//! resman = { version = "0.10.0", features = ["fn_res"] }
+//! resman = { version = "0.11.0", features = ["debug"] }
+//! resman = { version = "0.11.0", features = ["fn_res"] }
+//! resman = { version = "0.11.0", features = ["fn_res", "fn_res_mut"] }
+//! resman = { version = "0.11.0", features = ["fn_res", "fn_meta"] }
+//! resman = { version = "0.11.0", features = ["fn_res", "fn_res_mut", "fn_meta"] }
+//!
+//! # requires nightly
+//! resman = { version = "0.11.0", features = ["fn_res", "fn_res_mut", "fn_res_once"] }
 //! ```
 //!
 //! In code:
@@ -159,6 +167,22 @@
 //! Use [`FnRes::try_call`] for a non-panicking version, which will return a
 //! [`BorrowFail`] error if there is an overlapping borrow conflict at runtime.
 //!
+//! #### `"fn_res_mut"`:
+//!
+//! Like `"fn_res"`, enables the `IntoFnResMut` and `FnResMut` traits.
+//!
+//! `FnResMut` is implemented for functions and closures that `impl FnMut`, but
+//! not `Fn`.
+//!
+//! #### `"fn_res_once"`:
+//!
+//! ***Requires nightly***
+//!
+//! Like `"fn_res_mut"`, enables the `IntoFnResOnce` and `FnResOnce` traits.
+//!
+//! `FnResOnce` is implemented for functions and closures that `impl FnOnce`,
+//! but not `FnMut`.
+//!
 //! #### `"fn_meta"`:
 //!
 //! Adds [`FnMeta`] as an implied trait to [`FnRes`]. This means function
@@ -171,7 +195,8 @@
 //!
 //! This is feature gated because compilation time increasing significantly with
 //! higher numbers of arguments -- as much as from 4 seconds for 6 arguments
-//! to 26 seconds for 8 arguments.
+//! to 26 seconds for 8 arguments when only `"fn_res"` is enabled, and up to a
+//! minute when `"fn_mut"` and `"fn_once"` are enabled.
 //!
 //!
 //! ## See Also
@@ -215,4 +240,30 @@ mod fn_res;
 #[cfg(feature = "fn_res")]
 mod fn_resource;
 #[cfg(feature = "fn_res")]
+mod fn_resource_impl;
+#[cfg(feature = "fn_res")]
 mod into_fn_res;
+
+#[cfg(all(feature = "fn_res", feature = "fn_meta"))]
+mod fn_resource_meta_impl;
+
+#[cfg(feature = "fn_res_mut")]
+pub use crate::{fn_res_mut::FnResMut, into_fn_res_mut::IntoFnResMut};
+#[cfg(feature = "fn_res_mut")]
+mod fn_res_mut;
+#[cfg(feature = "fn_res_mut")]
+mod into_fn_res_mut;
+
+#[cfg(feature = "fn_res_once")]
+pub use crate::{fn_res_once::FnResOnce, into_fn_res_once::IntoFnResOnce};
+#[cfg(feature = "fn_res_once")]
+mod fn_res_once;
+#[cfg(feature = "fn_res_once")]
+mod into_fn_res_once;
+
+#[cfg(feature = "fn_res")]
+mod fn_res_impl;
+#[cfg(feature = "fn_res_mut")]
+mod fn_res_mut_impl;
+#[cfg(feature = "fn_res_once")]
+mod fn_res_once_impl;

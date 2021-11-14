@@ -1,6 +1,6 @@
 [package]
 name = "resman"
-version = "0.10.0"
+version = "0.11.0"
 authors = ["Azriel Hoh <azriel91@gmail.com>"]
 edition = "2021"
 description = "Runtime managed resource borrowing."
@@ -22,4 +22,6 @@ rt_map = "0.5.0"
 default = []
 debug = []
 fn_res = []
+fn_res_once = []
+fn_res_mut = []
 high_arg_count = ["fn_meta/high_arg_count"]

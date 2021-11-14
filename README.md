@@ -26,12 +26,17 @@ following differences:
 Add the following to `Cargo.toml`
 
 ```toml
-resman = "0.10.0"
+resman = "0.11.0"
 
 # or
-resman = { version = "0.10.0", features = ["debug"] }
-resman = { version = "0.10.0", features = ["fn_res"] }
-resman = { version = "0.10.0", features = ["fn_res", "fn_meta"] }
+resman = { version = "0.11.0", features = ["debug"] }
+resman = { version = "0.11.0", features = ["fn_res"] }
+resman = { version = "0.11.0", features = ["fn_res", "fn_res_mut"] }
+resman = { version = "0.11.0", features = ["fn_res", "fn_meta"] }
+resman = { version = "0.11.0", features = ["fn_res", "fn_res_mut", "fn_meta"] }
+
+# requires nightly
+resman = { version = "0.11.0", features = ["fn_res", "fn_res_mut", "fn_res_once"] }
 ```
 
 In code:
@@ -167,9 +172,26 @@ the same time when using [`FnRes::call`], otherwise it will panic.
 Use [`FnRes::try_call`] for a non-panicking version, which will return a
 [`BorrowFail`] error if there is an overlapping borrow conflict at runtime.
 
+#### `"fn_res_mut"`:
+
+Like `"fn_res"`, enables the `IntoFnResMut` and `FnResMut` traits.
+
+`FnResMut` is implemented for functions and closures that `impl FnMut`, but
+not `Fn`.
+
+#### `"fn_res_once"`:
+
+***Requires nightly***
+
+Like `"fn_res_mut"`, enables the `IntoFnResOnce` and `FnResOnce` traits.
+
+`FnResOnce` is implemented for functions and closures that `impl FnOnce`,
+but not `FnMut`.
+
 #### `"fn_meta"`:
 
-Adds [`FnMeta`] as an implied trait to [`FnRes`]. This means function metadata can be queried for any `FnRes`.
+Adds [`FnMeta`] as an implied trait to [`FnRes`]. This means function
+metadata can be queried for any `FnRes`.
 
 #### `"high_arg_count"`:
 
@@ -178,7 +200,8 @@ Raises the number of arguments that [`FnRes`], [`IntoFnRes`], and
 
 This is feature gated because compilation time increasing significantly with
 higher numbers of arguments -- as much as from 4 seconds for 6 arguments
-to 26 seconds for 8 arguments.
+to 26 seconds for 8 arguments when only `"fn_res"` is enabled, and up to a
+minute when `"fn_mut"` and `"fn_once"` are enabled.
 
 
 ## See Also

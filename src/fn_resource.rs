@@ -2,7 +2,7 @@ use core::marker::PhantomData;
 
 use rt_map::BorrowFail;
 
-use crate::{FnRes, Resources};
+use crate::Resources;
 
 /// Function that gets its arguments / parameters from a `Resources` map.
 pub struct FnResource<Fun, Ret, Args> {
@@ -12,14 +12,37 @@ pub struct FnResource<Fun, Ret, Args> {
     marker: PhantomData<(Fun, Ret, Args)>,
 }
 
-// Unfortuantely we have to `include!` instead of use a `#[path]` attribute.
-// Pending: <https://github.com/rust-lang/rust/issues/48250>
-include!(concat!(env!("OUT_DIR"), "/fn_resource_impl.rs"));
+#[cfg(feature = "fn_res_once")]
+impl<Fun, Ret> FnResource<Fun, Ret, ()>
+where
+    Fun: FnOnce() -> Ret + 'static,
+    Ret: 'static,
+{
+    pub fn call_once(self, _resources: &Resources) -> Ret {
+        (self.func)()
+    }
 
-// Unfortuantely we have to `include!` instead of use a `#[path]` attribute.
-// Pending: <https://github.com/rust-lang/rust/issues/48250>
-#[cfg(feature = "fn_meta")]
-include!(concat!(env!("OUT_DIR"), "/fn_resource_meta_impl.rs"));
+    pub fn try_call_once(self, _resources: &Resources) -> Result<Ret, BorrowFail> {
+        let ret_value = (self.func)();
+        Ok(ret_value)
+    }
+}
+
+#[cfg(feature = "fn_res_mut")]
+impl<Fun, Ret> FnResource<Fun, Ret, ()>
+where
+    Fun: FnMut() -> Ret + 'static,
+    Ret: 'static,
+{
+    pub fn call_mut(&mut self, _resources: &Resources) -> Ret {
+        (self.func)()
+    }
+
+    pub fn try_call_mut(&mut self, _resources: &Resources) -> Result<Ret, BorrowFail> {
+        let ret_value = (self.func)();
+        Ok(ret_value)
+    }
+}
 
 impl<Fun, Ret> FnResource<Fun, Ret, ()>
 where
@@ -39,7 +62,7 @@ where
 #[cfg(feature = "fn_meta")]
 impl<Fun, Ret> fn_meta::FnMeta for FnResource<Fun, Ret, ()>
 where
-    Fun: Fn() -> Ret + 'static,
+    Fun: FnOnce() -> Ret + 'static,
     Ret: 'static,
 {
     fn borrows(&self) -> fn_meta::TypeIds {
@@ -51,22 +74,6 @@ where
     }
 }
 
-impl<Fun, Ret> FnRes for FnResource<Fun, Ret, ()>
-where
-    Fun: Fn() -> Ret + 'static,
-    Ret: 'static,
-{
-    type Ret = Ret;
-
-    fn call<'f>(&self, resources: &Resources) -> Ret {
-        Self::call(self, resources)
-    }
-
-    fn try_call<'f>(&self, resources: &Resources) -> Result<Ret, BorrowFail> {
-        Self::try_call(self, resources)
-    }
-}
-
 /// Extension to return [`FnResource`] for a function.
 pub trait IntoFnResource<Fun, Ret, Args> {
     /// Returns the function wrapped as a `FnResource`.
@@ -75,7 +82,7 @@ pub trait IntoFnResource<Fun, Ret, Args> {
 
 impl<Fun, Ret> IntoFnResource<Fun, Ret, ()> for Fun
 where
-    Fun: Fn() -> Ret + 'static,
+    Fun: FnOnce() -> Ret + 'static,
     Ret: 'static,
 {
     fn into_fn_resource(self) -> FnResource<Fun, Ret, ()> {
@@ -88,7 +95,7 @@ where
 
 impl<Fun, Ret, A> IntoFnResource<Fun, Ret, (A,)> for Fun
 where
-    Fun: Fn(A) -> Ret + 'static,
+    Fun: FnOnce(A) -> Ret + 'static,
     Ret: 'static,
 {
     fn into_fn_resource(self) -> FnResource<Fun, Ret, (A,)> {
@@ -101,7 +108,7 @@ where
 
 impl<Fun, Ret, A, B> IntoFnResource<Fun, Ret, (A, B)> for Fun
 where
-    Fun: Fn(A, B) -> Ret + 'static,
+    Fun: FnOnce(A, B) -> Ret + 'static,
     Ret: 'static,
 {
     fn into_fn_resource(self) -> FnResource<Fun, Ret, (A, B)> {
@@ -114,7 +121,7 @@ where
 
 impl<Fun, Ret, A, B, C> IntoFnResource<Fun, Ret, (A, B, C)> for Fun
 where
-    Fun: Fn(A, B, C) -> Ret + 'static,
+    Fun: FnOnce(A, B, C) -> Ret + 'static,
     Ret: 'static,
 {
     fn into_fn_resource(self) -> FnResource<Fun, Ret, (A, B, C)> {
@@ -127,7 +134,7 @@ where
 
 impl<Fun, Ret, A, B, C, D> IntoFnResource<Fun, Ret, (A, B, C, D)> for Fun
 where
-    Fun: Fn(A, B, C, D) -> Ret + 'static,
+    Fun: FnOnce(A, B, C, D) -> Ret + 'static,
     Ret: 'static,
 {
     fn into_fn_resource(self) -> FnResource<Fun, Ret, (A, B, C, D)> {
@@ -140,7 +147,7 @@ where
 
 impl<Fun, Ret, A, B, C, D, E> IntoFnResource<Fun, Ret, (A, B, C, D, E)> for Fun
 where
-    Fun: Fn(A, B, C, D, E) -> Ret + 'static,
+    Fun: FnOnce(A, B, C, D, E) -> Ret + 'static,
     Ret: 'static,
 {
     fn into_fn_resource(self) -> FnResource<Fun, Ret, (A, B, C, D, E)> {
@@ -153,7 +160,7 @@ where
 
 impl<Fun, Ret, A, B, C, D, E, F> IntoFnResource<Fun, Ret, (A, B, C, D, E, F)> for Fun
 where
-    Fun: Fn(A, B, C, D, E, F) -> Ret + 'static,
+    Fun: FnOnce(A, B, C, D, E, F) -> Ret + 'static,
     Ret: 'static,
 {
     fn into_fn_resource(self) -> FnResource<Fun, Ret, (A, B, C, D, E, F)> {
@@ -167,7 +174,7 @@ where
 #[cfg(feature = "high_arg_count")]
 impl<Fun, Ret, A, B, C, D, E, F, G> IntoFnResource<Fun, Ret, (A, B, C, D, E, F, G)> for Fun
 where
-    Fun: Fn(A, B, C, D, E, F, G) -> Ret + 'static,
+    Fun: FnOnce(A, B, C, D, E, F, G) -> Ret + 'static,
     Ret: 'static,
 {
     #[allow(clippy::type_complexity)]
@@ -182,7 +189,7 @@ where
 #[cfg(feature = "high_arg_count")]
 impl<Fun, Ret, A, B, C, D, E, F, G, H> IntoFnResource<Fun, Ret, (A, B, C, D, E, F, G, H)> for Fun
 where
-    Fun: Fn(A, B, C, D, E, F, G, H) -> Ret + 'static,
+    Fun: FnOnce(A, B, C, D, E, F, G, H) -> Ret + 'static,
     Ret: 'static,
 {
     #[allow(clippy::type_complexity)]

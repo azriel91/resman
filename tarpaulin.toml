@@ -6,6 +6,12 @@ features = "debug"
 [fn_res]
 features = "fn_res"
 
+[fn_res_mut]
+features = "fn_res fn_res_mut"
+
+[fn_res_once]
+features = "fn_res fn_res_mut fn_res_once"
+
 [debug_fn_res]
 features = "debug fn_res"
 
@@ -13,7 +19,7 @@ features = "debug fn_res"
 features = "debug fn_res fn_meta"
 
 [high_arg_count]
-features = "debug fn_res fn_meta high_arg_count"
+features = "debug fn_res fn_res_mut fn_res_once fn_meta high_arg_count"
 
 [report]
 out = ["Html", "Xml"]
