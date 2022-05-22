@@ -25,7 +25,7 @@ pub trait FnResOnce {
 /// functions* as `Box<dyn FnResOnce>`, even though their arguments may be
 /// different.
 #[cfg(feature = "fn_meta")]
-pub trait FnResOnce: fn_meta::FnMeta {
+pub trait FnResOnce: fn_meta::FnMetaDyn {
     /// Return type of the function.
     type Ret;
 
@@ -38,7 +38,7 @@ pub trait FnResOnce: fn_meta::FnMeta {
 
 impl<T, Ret> FnResOnce for Box<T>
 where
-    T: FnResOnce<Ret = Ret>,
+    T: FnResOnce<Ret = Ret> + fn_meta::FnMeta,
 {
     type Ret = Ret;
 

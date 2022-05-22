@@ -60,7 +60,7 @@ where
 }
 
 #[cfg(feature = "fn_meta")]
-impl<Fun, Ret> fn_meta::FnMeta for FnResource<Fun, Ret, ()>
+impl<Fun, Ret> fn_meta::FnMetaDyn for FnResource<Fun, Ret, ()>
 where
     Fun: FnOnce() -> Ret + 'static,
     Ret: 'static,
@@ -556,7 +556,7 @@ mod tests {
     fn fn_meta_integration() {
         use std::any::TypeId;
 
-        use fn_meta::FnMeta;
+        use fn_meta::FnMetaDyn;
 
         let fn_res = f_w2_r2_w2_r1.into_fn_resource();
         let borrows = fn_res.borrows();

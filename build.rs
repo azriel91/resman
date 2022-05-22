@@ -600,7 +600,7 @@ mod fn_resource_meta_impl {
         write!(
             fn_resource_meta_impl,
             r#"
-impl<Fun, Ret, {args_csv}> fn_meta::FnMeta for FnResource<Fun, Ret, ({arg_refs_csv})>
+impl<Fun, Ret, {args_csv}> fn_meta::FnMetaDyn for FnResource<Fun, Ret, ({arg_refs_csv})>
 where
     Fun: FnOnce({arg_refs_csv}) -> Ret + 'static,
     Ret: 'static,
