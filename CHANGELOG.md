@@ -1,6 +1,10 @@
 # Changelog
 
-## 0.11.0 (unreleased)
+## 0.12.0 (2022-05-22)
+
+* Update `fn_meta` to `0.5.0`.
+
+## 0.11.0 (2021-11-14)
 
 * Add `"fn_res_mut"` feature, gating `FnResMut` and `IntoFnResMut`.
 * Add `"fn_res_once"` feature, gating `FnResOnce` and `IntoFnResOnce`.
