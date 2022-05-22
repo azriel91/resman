@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.12.0 (2022-05-23)
+
+* Update `fn_meta` to `0.6.0`.
+* `fn_meta` is automatically enabled if any of the `fn_res*` features are enabled.
+
 ## 0.12.0 (2022-05-22)
 
 * Update `fn_meta` to `0.5.0`.
