@@ -66,7 +66,23 @@ pub trait FnResMut: crate::FnResOnce + fn_meta::FnMeta + fn_meta::FnMetaDyn {
     fn try_call_mut(&mut self, resources: &Resources) -> Result<Self::Ret, BorrowFail>;
 }
 
-#[cfg(not(feature = "fn_res_once"))]
+#[cfg(all(not(feature = "fn_res_once"), not(feature = "fn_meta")))]
+impl<T, Ret> FnResMut for Box<T>
+where
+    T: FnResMut<Ret = Ret>,
+{
+    type Ret = Ret;
+
+    fn call_mut(&mut self, resources: &Resources) -> Self::Ret {
+        self.deref_mut().call_mut(resources)
+    }
+
+    fn try_call_mut(&mut self, resources: &Resources) -> Result<Self::Ret, BorrowFail> {
+        self.deref_mut().try_call_mut(resources)
+    }
+}
+
+#[cfg(all(not(feature = "fn_res_once"), feature = "fn_meta"))]
 impl<T, Ret> FnResMut for Box<T>
 where
     T: FnResMut<Ret = Ret> + fn_meta::FnMeta + fn_meta::FnMetaDyn,
@@ -82,7 +98,21 @@ where
     }
 }
 
-#[cfg(feature = "fn_res_once")]
+#[cfg(all(feature = "fn_res_once", not(feature = "fn_meta")))]
+impl<T, Ret> FnResMut for Box<T>
+where
+    T: FnResMut<Ret = Ret>,
+{
+    fn call_mut(&mut self, resources: &Resources) -> Self::Ret {
+        self.deref_mut().call_mut(resources)
+    }
+
+    fn try_call_mut(&mut self, resources: &Resources) -> Result<Self::Ret, BorrowFail> {
+        self.deref_mut().try_call_mut(resources)
+    }
+}
+
+#[cfg(all(feature = "fn_res_once", feature = "fn_meta"))]
 impl<T, Ret> FnResMut for Box<T>
 where
     T: FnResMut<Ret = Ret> + fn_meta::FnMeta + fn_meta::FnMetaDyn,

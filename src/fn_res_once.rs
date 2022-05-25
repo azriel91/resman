@@ -36,6 +36,25 @@ pub trait FnResOnce: fn_meta::FnMeta + fn_meta::FnMetaDyn {
     fn try_call_once(self, resources: &Resources) -> Result<Self::Ret, BorrowFail>;
 }
 
+#[cfg(not(feature = "fn_meta"))]
+impl<T, Ret> FnResOnce for Box<T>
+where
+    T: FnResOnce<Ret = Ret>,
+{
+    type Ret = Ret;
+
+    fn call_once(self, resources: &Resources) -> Self::Ret {
+        let fn_res_once = Box::into_inner(self);
+        fn_res_once.call_once(resources)
+    }
+
+    fn try_call_once(self, resources: &Resources) -> Result<Self::Ret, BorrowFail> {
+        let fn_res_once = Box::into_inner(self);
+        fn_res_once.try_call_once(resources)
+    }
+}
+
+#[cfg(feature = "fn_meta")]
 impl<T, Ret> FnResOnce for Box<T>
 where
     T: FnResOnce<Ret = Ret> + fn_meta::FnMeta + fn_meta::FnMetaDyn,
