@@ -2,7 +2,7 @@
 
 [![Crates.io](https://img.shields.io/crates/v/resman.svg)](https://crates.io/crates/resman)
 [![docs.rs](https://img.shields.io/docsrs/resman)](https://docs.rs/resman)
-![CI](https://github.com/azriel91/resman/workflows/CI/badge.svg)
+[![CI](https://github.com/azriel91/resman/workflows/CI/badge.svg)](https://github.com/azriel91/resman/actions/workflows/ci.yml)
 [![Coverage Status](https://codecov.io/gh/azriel91/resman/branch/main/graph/badge.svg)](https://codecov.io/gh/azriel91/resman)
 
 Runtime managed resource borrowing.
@@ -26,17 +26,17 @@ following differences:
 Add the following to `Cargo.toml`
 
 ```toml
-resman = "0.13.0"
+resman = "0.14.0"
 
 # or
-resman = { version = "0.13.0", features = ["debug"] }
-resman = { version = "0.13.0", features = ["fn_res"] }
-resman = { version = "0.13.0", features = ["fn_res", "fn_res_mut"] }
-resman = { version = "0.13.0", features = ["fn_res", "fn_meta"] }
-resman = { version = "0.13.0", features = ["fn_res", "fn_res_mut", "fn_meta"] }
+resman = { version = "0.14.0", features = ["debug"] }
+resman = { version = "0.14.0", features = ["fn_res"] }
+resman = { version = "0.14.0", features = ["fn_res", "fn_res_mut"] }
+resman = { version = "0.14.0", features = ["fn_res", "fn_meta"] }
+resman = { version = "0.14.0", features = ["fn_res", "fn_res_mut", "fn_meta"] }
 
 # requires nightly
-resman = { version = "0.13.0", features = ["fn_res", "fn_res_mut", "fn_res_once"] }
+resman = { version = "0.14.0", features = ["fn_res", "fn_res_mut", "fn_res_once"] }
 ```
 
 In code:
