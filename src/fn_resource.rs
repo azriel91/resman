@@ -60,6 +60,21 @@ where
 }
 
 #[cfg(feature = "fn_meta")]
+impl<Fun, Ret> fn_meta::FnMeta for FnResource<Fun, Ret, ()>
+where
+    Fun: FnOnce() -> Ret + 'static,
+    Ret: 'static,
+{
+    fn borrows() -> fn_meta::TypeIds {
+        <fn_meta::FnMetadata<Fun, Ret, ()> as fn_meta::FnMeta>::borrows()
+    }
+
+    fn borrow_muts() -> fn_meta::TypeIds {
+        <fn_meta::FnMetadata<Fun, Ret, ()> as fn_meta::FnMeta>::borrow_muts()
+    }
+}
+
+#[cfg(feature = "fn_meta")]
 impl<Fun, Ret> fn_meta::FnMetaDyn for FnResource<Fun, Ret, ()>
 where
     Fun: FnOnce() -> Ret + 'static,

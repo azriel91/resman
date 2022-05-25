@@ -41,7 +41,7 @@ pub trait FnResMut: crate::FnResOnce {
 /// functions* as `Box<dyn FnResMut>`, even though their arguments may be
 /// different.
 #[cfg(all(not(feature = "fn_res_once"), feature = "fn_meta"))]
-pub trait FnResMut: fn_meta::FnMetaDyn {
+pub trait FnResMut: fn_meta::FnMeta + fn_meta::FnMetaDyn {
     /// Return type of the function.
     type Ret;
 
@@ -58,7 +58,7 @@ pub trait FnResMut: fn_meta::FnMetaDyn {
 /// functions* as `Box<dyn FnResMut>`, even though their arguments may be
 /// different.
 #[cfg(all(feature = "fn_res_once", feature = "fn_meta"))]
-pub trait FnResMut: crate::FnResOnce + fn_meta::FnMetaDyn {
+pub trait FnResMut: crate::FnResOnce + fn_meta::FnMeta + fn_meta::FnMetaDyn {
     /// Runs the function.
     fn call_mut(&mut self, resources: &Resources) -> Self::Ret;
 
@@ -69,7 +69,7 @@ pub trait FnResMut: crate::FnResOnce + fn_meta::FnMetaDyn {
 #[cfg(not(feature = "fn_res_once"))]
 impl<T, Ret> FnResMut for Box<T>
 where
-    T: FnResMut<Ret = Ret> + fn_meta::FnMeta,
+    T: FnResMut<Ret = Ret> + fn_meta::FnMeta + fn_meta::FnMetaDyn,
 {
     type Ret = Ret;
 
@@ -85,7 +85,7 @@ where
 #[cfg(feature = "fn_res_once")]
 impl<T, Ret> FnResMut for Box<T>
 where
-    T: FnResMut<Ret = Ret> + fn_meta::FnMeta,
+    T: FnResMut<Ret = Ret> + fn_meta::FnMeta + fn_meta::FnMetaDyn,
 {
     fn call_mut(&mut self, resources: &Resources) -> Self::Ret {
         self.deref_mut().call_mut(resources)

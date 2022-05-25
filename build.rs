@@ -600,6 +600,21 @@ mod fn_resource_meta_impl {
         write!(
             fn_resource_meta_impl,
             r#"
+impl<Fun, Ret, {args_csv}> fn_meta::FnMeta for FnResource<Fun, Ret, ({arg_refs_csv})>
+where
+    Fun: FnOnce({arg_refs_csv}) -> Ret + 'static,
+    Ret: 'static,
+    {arg_bounds_list}
+{{
+    fn borrows() -> fn_meta::TypeIds {{
+        <fn_meta::FnMetadata<Fun, Ret, ({arg_refs_csv})> as fn_meta::FnMeta>::borrows()
+    }}
+
+    fn borrow_muts() -> fn_meta::TypeIds {{
+        <fn_meta::FnMetadata<Fun, Ret, ({arg_refs_csv})> as fn_meta::FnMeta>::borrow_muts()
+    }}
+}}
+
 impl<Fun, Ret, {args_csv}> fn_meta::FnMetaDyn for FnResource<Fun, Ret, ({arg_refs_csv})>
 where
     Fun: FnOnce({arg_refs_csv}) -> Ret + 'static,
