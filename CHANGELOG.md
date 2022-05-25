@@ -1,6 +1,12 @@
 # Changelog
 
-## 0.12.0 (2022-05-23)
+## 0.14.0 (2022-05-26)
+
+* Update `fn_meta` to `0.7.0`.
+* Implement `FnMeta` for `dyn FnRes`.
+* `fn_meta` is **not** automatically enabled (reverts change from `0.13.0`).
+
+## 0.13.0 (2022-05-23)
 
 * Update `fn_meta` to `0.6.0`.
 * `fn_meta` is automatically enabled if any of the `fn_res*` features are enabled.
