@@ -1,6 +1,6 @@
 # Changelog
 
-## 0.15.0 (unreleased)
+## 0.15.0 (2022-07-05)
 
 * Derive `Deref` and `DerefMut` for `Resources`. ([#7])
 
