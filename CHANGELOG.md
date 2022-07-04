@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.15.0 (unreleased)
+
+* Derive `Deref` and `DerefMut` for `Resources`. ([#7])
+
+[#7]: https://github.com/azriel91/resman/pull/7
+
 ## 0.14.0 (2022-05-26)
 
 * Update `fn_meta` to `0.7.0`.
