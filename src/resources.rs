@@ -1,4 +1,8 @@
-use std::{any::TypeId, fmt};
+use std::{
+    any::TypeId,
+    fmt,
+    ops::{Deref, DerefMut},
+};
 
 use rt_map::{BorrowFail, Cell, RtMap};
 
@@ -248,6 +252,20 @@ impl fmt::Debug for Resources {
         });
 
         debug_map.finish()
+    }
+}
+
+impl Deref for Resources {
+    type Target = RtMap<TypeId, Box<dyn Resource>>;
+
+    fn deref(&self) -> &Self::Target {
+        &self.0
+    }
+}
+
+impl DerefMut for Resources {
+    fn deref_mut(&mut self) -> &mut Self::Target {
+        &mut self.0
     }
 }
 
