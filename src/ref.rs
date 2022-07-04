@@ -36,7 +36,7 @@ where
     R: Resource + fmt::Debug + 'a,
 {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        let inner: &R = &*self;
+        let inner: &R = self;
         f.debug_struct("Ref").field("inner", inner).finish()
     }
 }
@@ -46,8 +46,8 @@ where
     R: Resource + PartialEq + 'a,
 {
     fn eq(&self, other: &Self) -> bool {
-        let r_self: &R = &*self;
-        let r_other: &R = &*other;
+        let r_self: &R = self;
+        let r_other: &R = other;
         r_self == r_other
     }
 }
