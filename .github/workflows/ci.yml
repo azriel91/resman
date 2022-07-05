@@ -102,9 +102,6 @@ jobs:
       - uses: taiki-e/install-action@cargo-llvm-cov
       - uses: taiki-e/install-action@nextest
 
-      - name: 'Create coverage directory'
-        run: mkdir -p ./target/coverage
-
       - name: 'Collect coverage'
         run: ./coverage.sh
 
