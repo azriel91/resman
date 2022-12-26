@@ -1,5 +1,12 @@
 # Changelog
 
+## 0.16.0 (2022-12-26)
+
+* Add `Resources::insert_raw`. ([#9])
+* Add `Resource::type_id`. ([#9])
+
+[#9]: https://github.com/azriel91/resman/pull/9
+
 ## 0.15.0 (2022-07-05)
 
 * Derive `Deref` and `DerefMut` for `Resources`. ([#7])

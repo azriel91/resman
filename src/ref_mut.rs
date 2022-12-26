@@ -69,12 +69,9 @@ where
 
 #[cfg(test)]
 mod tests {
-    use std::{
-        fmt::{self, Write},
-        sync::atomic::AtomicUsize,
-    };
+    use std::fmt::{self, Write};
 
-    use rt_map::CellRefMut;
+    use rt_map::Cell;
 
     use crate::Resource;
 
@@ -82,12 +79,9 @@ mod tests {
 
     #[test]
     fn debug_includes_inner_field() -> fmt::Result {
-        let flag = AtomicUsize::new(0);
-        let mut value: Box<dyn Resource> = Box::new(A(1));
-        let ref_mut = RefMut::<A>::new(rt_map::RefMut::new(CellRefMut {
-            flag: &flag,
-            value: &mut value,
-        }));
+        let value: Box<dyn Resource> = Box::new(A(1));
+        let cell = Cell::new(value);
+        let ref_mut = RefMut::<A>::new(rt_map::RefMut::new(cell.borrow_mut()));
 
         let mut debug_string = String::with_capacity(64);
         write!(&mut debug_string, "{:?}", ref_mut)?;
@@ -98,58 +92,29 @@ mod tests {
 
     #[test]
     fn partial_eq_compares_value() -> fmt::Result {
-        let flag = AtomicUsize::new(0);
-        let mut value: Box<dyn Resource> = Box::new(A(1));
-        let mut value_clone: Box<dyn Resource> = Box::new(A(1));
-        let ref_mut = RefMut::<A>::new(rt_map::RefMut::new(CellRefMut {
-            flag: &flag,
-            value: &mut value,
-        }));
+        let value_0: Box<dyn Resource> = Box::new(A(1));
+        let value_1: Box<dyn Resource> = Box::new(A(1));
+        let cell_0 = Cell::new(value_0);
+        let ref_mut_0 = RefMut::<A>::new(rt_map::RefMut::new(cell_0.borrow_mut()));
+        let cell_1 = Cell::new(value_1);
+        let ref_mut_1 = RefMut::<A>::new(rt_map::RefMut::new(cell_1.borrow_mut()));
 
-        assert_eq!(
-            RefMut::<A>::new(rt_map::RefMut::new(CellRefMut {
-                flag: &flag,
-                value: &mut value_clone,
-            })),
-            ref_mut
-        );
-        assert_ne!(
-            RefMut::<A>::new(rt_map::RefMut::new(CellRefMut {
-                flag: &flag,
-                value: &mut (Box::new(A(2)) as Box<dyn Resource>),
-            })),
-            ref_mut
-        );
+        assert_eq!(ref_mut_1, ref_mut_0);
 
         Ok(())
     }
 
     #[test]
     fn deref_mut_returns_value() -> fmt::Result {
-        let flag = AtomicUsize::new(0);
-        let mut value: Box<dyn Resource> = Box::new(A(1));
-        let mut ref_mut = RefMut::<A>::new(rt_map::RefMut::new(CellRefMut {
-            flag: &flag,
-            value: &mut value,
-        }));
+        let value: Box<dyn Resource> = Box::new(A(1));
+        let cell = Cell::new(value);
+        let mut ref_mut = RefMut::<A>::new(rt_map::RefMut::new(cell.borrow_mut()));
 
-        assert_eq!(
-            RefMut::<A>::new(rt_map::RefMut::new(CellRefMut {
-                flag: &flag,
-                value: &mut (Box::new(A(1)) as Box<dyn Resource>),
-            })),
-            ref_mut
-        );
+        assert_eq!(&mut A(1), &*ref_mut);
 
         ref_mut.0 = 2;
 
-        assert_eq!(
-            RefMut::<A>::new(rt_map::RefMut::new(CellRefMut {
-                flag: &flag,
-                value: &mut (Box::new(A(2)) as Box<dyn Resource>),
-            })),
-            ref_mut
-        );
+        assert_eq!(&mut A(2), &*ref_mut);
 
         Ok(())
     }

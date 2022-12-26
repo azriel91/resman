@@ -1,4 +1,4 @@
-use std::any::Any;
+use std::any::{Any, TypeId};
 
 use downcast_rs::DowncastSync;
 
@@ -9,6 +9,7 @@ use downcast_rs::DowncastSync;
 /// readers).
 #[cfg(not(feature = "debug"))]
 pub trait Resource: DowncastSync + 'static {
+    fn type_id(&self) -> TypeId;
     fn type_name(&self) -> TypeNameLit;
 }
 
@@ -17,6 +18,10 @@ impl<T> Resource for T
 where
     T: Any + Send + Sync,
 {
+    fn type_id(&self) -> TypeId {
+        TypeId::of::<T>()
+    }
+
     fn type_name(&self) -> TypeNameLit {
         TypeNameLit(std::any::type_name::<T>())
     }
@@ -29,6 +34,7 @@ where
 /// readers).
 #[cfg(feature = "debug")]
 pub trait Resource: DowncastSync + std::fmt::Debug + 'static {
+    fn type_id(&self) -> TypeId;
     fn type_name(&self) -> TypeNameLit;
 }
 
@@ -37,6 +43,10 @@ impl<T> Resource for T
 where
     T: Any + std::fmt::Debug + Send + Sync,
 {
+    fn type_id(&self) -> TypeId {
+        TypeId::of::<T>()
+    }
+
     fn type_name(&self) -> TypeNameLit {
         TypeNameLit(std::any::type_name::<T>())
     }
