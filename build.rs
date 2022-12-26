@@ -11,16 +11,16 @@ fn main() {
     let out_dir = Path::new(&out_dir);
 
     #[cfg(feature = "fn_res")]
-    let mut fn_resource_impl = common::open_impl_file(&out_dir, "fn_resource_impl.rs");
+    let mut fn_resource_impl = common::open_impl_file(out_dir, "fn_resource_impl.rs");
     #[cfg(feature = "fn_res_once")]
-    let mut fn_res_once_impl = common::open_impl_file(&out_dir, "fn_res_once_impl.rs");
+    let mut fn_res_once_impl = common::open_impl_file(out_dir, "fn_res_once_impl.rs");
     #[cfg(feature = "fn_res_mut")]
-    let mut fn_res_mut_impl = common::open_impl_file(&out_dir, "fn_res_mut_impl.rs");
+    let mut fn_res_mut_impl = common::open_impl_file(out_dir, "fn_res_mut_impl.rs");
     #[cfg(feature = "fn_res")]
-    let mut fn_res_impl = common::open_impl_file(&out_dir, "fn_res_impl.rs");
+    let mut fn_res_impl = common::open_impl_file(out_dir, "fn_res_impl.rs");
 
     #[cfg(feature = "fn_meta")]
-    let mut fn_resource_meta_impl = common::open_impl_file(&out_dir, "fn_resource_meta_impl.rs");
+    let mut fn_resource_meta_impl = common::open_impl_file(out_dir, "fn_resource_meta_impl.rs");
 
     let mut write_fn = |arg_exprs: ArgExprs<'_>| {
         #[cfg(feature = "fn_res")]
@@ -94,7 +94,7 @@ mod common {
             .create(true)
             .write(true)
             .open(fn_resource_impl_path)
-            .unwrap_or_else(|e| panic!("Failed to open `{}`. Error: {}", file_name, e));
+            .unwrap_or_else(|e| panic!("Failed to open `{file_name}`. Error: {e}"));
         BufWriter::new(fn_resource_impl)
     }
 
@@ -126,8 +126,8 @@ mod common {
                 } else {
                     arg_refs_iter
                         .try_for_each(|(index, arg_ref)| match arg_ref {
-                            Ref::Immutable => write!(&mut arg_refs_csv, ", &A{}", index),
-                            Ref::Mutable => write!(&mut arg_refs_csv, ", &mut A{}", index),
+                            Ref::Immutable => write!(&mut arg_refs_csv, ", &A{index}"),
+                            Ref::Mutable => write!(&mut arg_refs_csv, ", &mut A{index}"),
                         })
                         .expect("Failed to append to `arg_refs_csv` string.");
                 }
@@ -169,15 +169,15 @@ mod common {
         let mut arg_refs_iter = arg_refs.iter().copied().enumerate();
         if let Some((index, arg_ref)) = arg_refs_iter.next() {
             match arg_ref {
-                Ref::Immutable => write!(&mut resource_arg_vars, "&*a{}", index),
-                Ref::Mutable => write!(&mut resource_arg_vars, "&mut *a{}", index),
+                Ref::Immutable => write!(&mut resource_arg_vars, "&*a{index}"),
+                Ref::Mutable => write!(&mut resource_arg_vars, "&mut *a{index}"),
             }
             .expect("Failed to append to `resource_arg_vars` string.")
         }
         arg_refs_iter
             .try_for_each(|(index, arg_ref)| match arg_ref {
-                Ref::Immutable => write!(&mut resource_arg_vars, ", &*a{}", index),
-                Ref::Mutable => write!(&mut resource_arg_vars, ", &mut *a{}", index),
+                Ref::Immutable => write!(&mut resource_arg_vars, ", &*a{index}"),
+                Ref::Mutable => write!(&mut resource_arg_vars, ", &mut *a{index}"),
             })
             .expect("Failed to append to `resource_arg_vars` string.");
         resource_arg_vars
@@ -191,12 +191,10 @@ mod common {
                 Ref::Immutable => writeln!(
                     &mut resource_arg_borrows,
                     "let a{index} = resources.borrow::<A{index}>();",
-                    index = index
                 ),
                 Ref::Mutable => writeln!(
                     &mut resource_arg_borrows,
                     "let mut a{index} = resources.borrow_mut::<A{index}>();",
-                    index = index
                 ),
             })
             .expect("Failed to append to `resource_arg_borrows` string.");
@@ -211,12 +209,10 @@ mod common {
                 Ref::Immutable => writeln!(
                     &mut resource_arg_try_borrows,
                     "let a{index} = resources.try_borrow::<A{index}>()?;",
-                    index = index
                 ),
                 Ref::Mutable => writeln!(
                     &mut resource_arg_try_borrows,
                     "let mut a{index} = resources.try_borrow_mut::<A{index}>()?;",
-                    index = index
                 ),
             })
             .expect("Failed to append to `resource_arg_try_borrows` string.");
@@ -289,13 +285,12 @@ mod common {
             #[cfg(feature = "debug")]
             write!(
                 &mut arg_bounds_list,
-                "\n    A{}: std::fmt::Debug + Send + Sync + 'static,",
-                n
+                "\n    A{n}: std::fmt::Debug + Send + Sync + 'static,"
             )
             .expect("Failed to append to args_csv string.");
 
             #[cfg(not(feature = "debug"))]
-            write!(&mut arg_bounds_list, "\n    A{}: Send + Sync + 'static,", n)
+            write!(&mut arg_bounds_list, "\n    A{n}: Send + Sync + 'static,")
                 .expect("Failed to append to args_csv string.");
             arg_bounds_list
         })
@@ -305,7 +300,7 @@ mod common {
         let mut args_csv = String::with_capacity(N * 4);
         args_csv.push_str("A0");
         (1..N).fold(args_csv, |mut args_csv, n| {
-            write!(&mut args_csv, ", A{}", n).expect("Failed to append to args_csv string.");
+            write!(&mut args_csv, ", A{n}").expect("Failed to append to args_csv string.");
             args_csv
         })
     }
@@ -354,12 +349,6 @@ where
     }}
 }}
 "#,
-            args_csv = args_csv,
-            arg_refs_csv = arg_refs_csv,
-            arg_bounds_list = arg_bounds_list,
-            resource_arg_borrows = resource_arg_borrows,
-            resource_arg_try_borrows = resource_arg_try_borrows,
-            resource_arg_vars = resource_arg_vars,
         )
         .expect("Failed to write to fn_resource_impl.rs");
 
@@ -387,12 +376,6 @@ where
     }}
 }}
 "#,
-            args_csv = args_csv,
-            arg_refs_csv = arg_refs_csv,
-            arg_bounds_list = arg_bounds_list,
-            resource_arg_borrows = resource_arg_borrows,
-            resource_arg_try_borrows = resource_arg_try_borrows,
-            resource_arg_vars = resource_arg_vars,
         )
         .expect("Failed to write to fn_resource_impl.rs");
 
@@ -419,12 +402,6 @@ where
     }}
 }}
 "#,
-            args_csv = args_csv,
-            arg_refs_csv = arg_refs_csv,
-            arg_bounds_list = arg_bounds_list,
-            resource_arg_borrows = resource_arg_borrows,
-            resource_arg_try_borrows = resource_arg_try_borrows,
-            resource_arg_vars = resource_arg_vars,
         )
         .expect("Failed to write to fn_resource_impl.rs");
     }
@@ -467,9 +444,6 @@ where
     }}
 }}
 "#,
-            args_csv = args_csv,
-            arg_refs_csv = arg_refs_csv,
-            arg_bounds_list = arg_bounds_list,
         )
         .expect("Failed to write to fn_res_once_impl.rs");
     }
@@ -516,10 +490,6 @@ where
     }}
 }}
 "#,
-            args_csv = args_csv,
-            arg_refs_csv = arg_refs_csv,
-            arg_bounds_list = arg_bounds_list,
-            ret_type_str = ret_type_str,
         )
         .expect("Failed to write to fn_res_mut_impl.rs");
     }
@@ -566,10 +536,6 @@ where
     }}
 }}
 "#,
-            args_csv = args_csv,
-            arg_refs_csv = arg_refs_csv,
-            arg_bounds_list = arg_bounds_list,
-            ret_type_str = ret_type_str,
         )
         .expect("Failed to write to fn_res_impl.rs");
     }
@@ -630,9 +596,6 @@ where
     }}
 }}
 "#,
-            args_csv = args_csv,
-            arg_refs_csv = arg_refs_csv,
-            arg_bounds_list = arg_bounds_list,
         )
         .expect("Failed to write to fn_resource_meta_impl.rs");
     }

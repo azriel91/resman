@@ -210,18 +210,13 @@ impl Resources {
         let type_name = std::any::type_name::<R>();
         match borrow_fail {
             BorrowFail::ValueNotFound => {
-                panic!(
-                    "Expected to borrow `{type_name}`, but it does not exist.",
-                    type_name = type_name
-                )
+                panic!("Expected to borrow `{type_name}`, but it does not exist.")
             }
             BorrowFail::BorrowConflictImm => panic!(
-                "Expected to borrow `{type_name}` immutably, but it was already borrowed mutably.",
-                type_name = type_name
+                "Expected to borrow `{type_name}` immutably, but it was already borrowed mutably."
             ),
             BorrowFail::BorrowConflictMut => panic!(
-                "Expected to borrow `{type_name}` mutably, but it was already borrowed mutably.",
-                type_name = type_name
+                "Expected to borrow `{type_name}` mutably, but it was already borrowed mutably."
             ),
         }
     }
