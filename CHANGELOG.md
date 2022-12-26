@@ -1,6 +1,6 @@
 # Changelog
 
-## unreleased
+## 0.16.0 (2022-12-26)
 
 * Add `Resources::insert_raw`. ([#9])
 * Add `Resource::type_id`. ([#9])
