@@ -71,6 +71,13 @@ jobs:
           toolchain: stable
           override: true
 
+      - name: workspaces Cache
+        id: workspaces_cache
+        uses: actions/cache@v3
+        with:
+          path: ~/.cargo/bin/cargo-workspaces
+          key: ${{ runner.os }}-cargo-workspaces
+
       - # FIXME: Switch back when actions-rs/cargo#217 gets merged
         uses: r3-os/actions-rust-cargo@fb222fe18dc90e381546d012f9e3d6f353f0f627
         if: steps.workspaces_cache.outputs.cache-hit != 'true'
