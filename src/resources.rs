@@ -78,7 +78,7 @@ impl Resources {
         Entry::new(self.0.entry(TypeId::of::<R>()))
     }
 
-    /// Inserts a resource into this container. If the resource existed before,
+    /// Inserts a resource into the map. If the resource existed before,
     /// it will be overwritten.
     ///
     /// # Examples
@@ -106,6 +106,11 @@ impl Resources {
         R: Resource,
     {
         self.0.insert(TypeId::of::<R>(), Box::new(r));
+    }
+
+    /// Inserts an already boxed resource into the map.
+    pub fn insert_raw(&mut self, type_id: TypeId, resource: Box<dyn Resource>) {
+        self.0.insert(type_id, resource);
     }
 
     /// Removes a resource of type `R` from this container and returns its
@@ -348,6 +353,18 @@ mod tests {
 
         let mut resources = Resources::default();
         resources.insert(Res);
+
+        assert!(resources.contains::<Res>());
+        assert!(!resources.contains::<Foo>());
+    }
+
+    #[test]
+    fn insert_raw() {
+        #[cfg_attr(feature = "debug", derive(Debug))]
+        struct Foo;
+
+        let mut resources = Resources::default();
+        resources.insert_raw(TypeId::of::<Res>(), Box::new(Res));
 
         assert!(resources.contains::<Res>());
         assert!(!resources.contains::<Foo>());
