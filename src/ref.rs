@@ -54,12 +54,9 @@ where
 
 #[cfg(test)]
 mod tests {
-    use std::{
-        fmt::{self, Write},
-        sync::atomic::AtomicUsize,
-    };
+    use std::fmt::{self, Write};
 
-    use rt_map::CellRef;
+    use rt_map::Cell;
 
     use crate::Resource;
 
@@ -67,12 +64,9 @@ mod tests {
 
     #[test]
     fn debug_includes_inner_field() -> fmt::Result {
-        let flag = AtomicUsize::new(0);
         let value: Box<dyn Resource> = Box::new(A(1));
-        let r#ref = Ref::<A>::new(rt_map::Ref::new(CellRef {
-            flag: &flag,
-            value: &value,
-        }));
+        let cell = Cell::new(value);
+        let r#ref = Ref::<A>::new(rt_map::Ref::new(cell.borrow()));
 
         let mut debug_string = String::with_capacity(64);
         write!(&mut debug_string, "{:?}", r#ref)?;
@@ -83,27 +77,16 @@ mod tests {
 
     #[test]
     fn partial_eq_compares_value() -> fmt::Result {
-        let flag = AtomicUsize::new(0);
-        let value: Box<dyn Resource> = Box::new(A(1));
-        let r#ref = Ref::<A>::new(rt_map::Ref::new(CellRef {
-            flag: &flag,
-            value: &value,
-        }));
+        let value_0: Box<dyn Resource> = Box::new(A(1));
+        let cell_0 = Cell::new(value_0);
+        let ref_0 = Ref::<A>::new(rt_map::Ref::new(cell_0.borrow()));
 
-        assert_eq!(
-            Ref::<A>::new(rt_map::Ref::new(CellRef {
-                flag: &flag,
-                value: &value,
-            })),
-            r#ref
-        );
-        assert_ne!(
-            Ref::<A>::new(rt_map::Ref::new(CellRef {
-                flag: &flag,
-                value: &(Box::new(A(2)) as Box<dyn Resource>),
-            })),
-            r#ref
-        );
+        let value_1: Box<dyn Resource> = Box::new(A(1));
+        let cell_1 = Cell::new(value_1);
+        let ref_1 = Ref::<A>::new(rt_map::Ref::new(cell_1.borrow()));
+
+        assert_eq!(ref_1, ref_0);
+        assert_eq!(Ref::<A>::new(rt_map::Ref::new(cell_0.borrow())), ref_0);
 
         Ok(())
     }
