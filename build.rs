@@ -68,7 +68,6 @@ mod common {
         fmt::Write as _,
         fs::{File, OpenOptions},
         io::BufWriter,
-        mem::MaybeUninit,
         path::Path,
     };
 
@@ -225,50 +224,21 @@ mod common {
             // Whether an argument is immutable or mutable is bed on its corresponding bit
             // value of `m`.
 
-            // Create an uninitialized array of `MaybeUninit`. The `assume_init` is safe
-            // because the type we are claiming to have initialized here is a bunch of
-            // `MaybeUninit`s, which do not require initialization.
-            //
-            // https://doc.rust-lang.org/stable/std/mem/union.MaybeUninit.html#initializing-an-array-element-by-element
-            //
-            // Switch this to `MaybeUninit::uninit_array` once it is stable.
-            let mut arg_refs: [MaybeUninit<Ref>; N] =
-                unsafe { MaybeUninit::uninit().assume_init() };
-
+            let mut arg_refs: [Ref; N] = [Ref::Immutable; N];
             arg_refs
                 .iter_mut()
                 .enumerate()
-                .for_each(move |(arg_n, arg_ref_mem)| {
+                .for_each(move |(n, arg_ref)| {
                     // for N = 5
                     // m can be 0..32
                     // if 31 >> 5 is 0
 
-                    if m >> arg_n & 1 == 0 {
-                        arg_ref_mem.write(Ref::Immutable);
+                    if m >> n & 1 == 0 {
+                        *arg_ref = Ref::Immutable;
                     } else {
-                        arg_ref_mem.write(Ref::Mutable);
+                        *arg_ref = Ref::Mutable;
                     }
                 });
-
-            // Everything is initialized. Transmute the array to the initialized type.
-            // Unfortunately we cannot use this, see the following issues:
-            //
-            // * <https://github.com/rust-lang/rust/issues/61956>
-            // * <https://github.com/rust-lang/rust/issues/80908>
-            //
-            // let arg_refs = unsafe { mem::transmute::<_, [Ref;
-            // N]>(arg_refs) };
-
-            #[allow(clippy::let_and_return)] // for clarity with `unsafe`
-            let arg_refs = {
-                let ptr = &mut arg_refs as *mut _ as *mut [Ref; N];
-                let array = unsafe { ptr.read() };
-
-                // We don't have to `mem::forget` the original because `Ref` is `Copy`.
-                // mem::forget(arg_refs);
-
-                array
-            };
 
             arg_refs
         })

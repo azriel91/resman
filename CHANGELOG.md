@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.16.1 (2023-04-06)
+
+* Panic when `Resources::insert_raw` is called with mismatching `TypeId` and `Box<T>`. ([#11])
+
+[#11]: https://github.com/azriel91/resman/pull/11
+
 ## 0.16.0 (2022-12-26)
 
 * Add `Resources::insert_raw`. ([#9])

@@ -110,6 +110,10 @@ impl Resources {
 
     /// Inserts an already boxed resource into the map.
     pub fn insert_raw(&mut self, type_id: TypeId, resource: Box<dyn Resource>) {
+        if type_id != Resource::type_id(&*resource) {
+            let type_name = Resource::type_name(&*resource);
+            panic!("`Resources::insert_raw` type_id does not match `{type_name:?}.type_id()`.");
+        }
         self.0.insert(type_id, resource);
     }
 
@@ -363,6 +367,20 @@ mod tests {
 
         assert!(resources.contains::<Res>());
         assert!(!resources.contains::<Foo>());
+    }
+
+    #[test]
+    #[should_panic(
+        expected = "`Resources::insert_raw` type_id does not match `resman::resources::tests::Res.type_id()`."
+    )]
+    fn insert_raw_panics_when_boxed_resource_does_not_match_key() {
+        #[cfg_attr(feature = "debug", derive(Debug))]
+        struct Foo;
+
+        let mut resources = Resources::default();
+        resources.insert_raw(TypeId::of::<Foo>(), Box::new(Res));
+
+        assert!(resources.contains::<Res>());
     }
 
     #[test]
