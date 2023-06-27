@@ -25,7 +25,10 @@ jobs:
     timeout-minutes: 10
     steps:
       - uses: actions/checkout@v3
-      - uses: dtolnay/rust-toolchain@stable
+      - uses: dtolnay/rust-toolchain@master
+        with:
+          toolchain: nightly
+          components: rustfmt
 
       - run: cargo fmt --all -- --check
 
@@ -37,7 +40,7 @@ jobs:
       RUSTDOCFLAGS: "-Dwarnings"
     steps:
       - uses: actions/checkout@v3
-      - uses: dtolnay/rust-toolchain@stable
+      - uses: dtolnay/rust-toolchain@nightly
 
       - name: Check spelling
         uses: crate-ci/typos@master
@@ -85,7 +88,7 @@ jobs:
     timeout-minutes: 10
     steps:
       - uses: actions/checkout@v3
-      - uses: dtolnay/rust-toolchain@stable
+      - uses: dtolnay/rust-toolchain@nightly
 
       - uses: taiki-e/install-action@nextest
       - name: 'Build and test'
@@ -100,7 +103,7 @@ jobs:
         run: git config --global core.symlinks true
 
       - uses: actions/checkout@v3
-      - uses: dtolnay/rust-toolchain@stable
+      - uses: dtolnay/rust-toolchain@nightly
 
       - uses: taiki-e/install-action@nextest
       - name: 'Build and test'
