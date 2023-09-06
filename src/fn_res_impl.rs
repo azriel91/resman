@@ -5,8 +5,7 @@ use crate::{FnRes, FnResource, Resources};
 #[cfg(not(feature = "fn_res_mut"))]
 impl<Fun, Ret> FnRes for FnResource<Fun, Ret, ()>
 where
-    Fun: Fn() -> Ret + 'static,
-    Ret: 'static,
+    Fun: Fn() -> Ret,
 {
     type Ret = Ret;
 
@@ -22,8 +21,7 @@ where
 #[cfg(feature = "fn_res_mut")]
 impl<Fun, Ret> FnRes for FnResource<Fun, Ret, ()>
 where
-    Fun: Fn() -> Ret + 'static,
-    Ret: 'static,
+    Fun: Fn() -> Ret,
 {
     fn call(&self, resources: &Resources) -> Ret {
         Self::call(self, resources)
