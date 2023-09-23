@@ -6,4 +6,4 @@ coverage_3 = ["llvm-cov", "nextest", "--no-report", "--output-dir", "./target/co
 coverage_4 = ["llvm-cov", "nextest", "--no-report", "--output-dir", "./target/coverage", "--features", "fn_res fn_res_mut fn_res_once"]
 coverage_5 = ["llvm-cov", "nextest", "--no-report", "--output-dir", "./target/coverage", "--features", "debug fn_res"]
 coverage_6 = ["llvm-cov", "nextest", "--no-report", "--output-dir", "./target/coverage", "--features", "debug fn_res fn_res_mut fn_res_once high_arg_count"]
-coverage_open = 'llvm-cov --no-run --open --output-dir ./target/coverage'
+coverage_open = 'llvm-cov report --open --output-dir ./target/coverage'
