@@ -1,10 +1,12 @@
 # Changelog
 
-## unreleased
+## 0.17.0 (2023-09-23)
 
-* ***Breaking:*** Change `Resources::remove::<R>` to return `R`.
-* Add `Resources::try_remove::<R>` to return `Result<R, ResourceFetchError>`.
-* Add `Resources::into_inner()`.
+* ***Breaking:*** Change `Resources::remove::<R>` to return `R`. ([#13])
+* Add `Resources::try_remove::<R>` to return `Result<R, ResourceFetchError>`. ([#13])
+* Add `Resources::into_inner()`. ([#13])
+
+ [#13]: https://github.com/azriel91/resman/pull/13
 
 
 ## 0.16.1 (2023-04-06)
