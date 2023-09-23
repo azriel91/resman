@@ -1,5 +1,11 @@
 # Changelog
 
+## unreleased
+
+* ***Breaking:*** Change `Resources::remove::<R>` to return `R`.
+* Add `Resources::try_remove::<R>` to return `Result<R, ResourceFetchError>`.
+* Add `Resources::into_inner()`.
+
 ## 0.16.1 (2023-04-06)
 
 * Panic when `Resources::insert_raw` is called with mismatching `TypeId` and `Box<T>`. ([#11])
