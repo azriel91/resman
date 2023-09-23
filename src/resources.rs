@@ -54,6 +54,11 @@ impl Resources {
         Self(RtMap::with_capacity(capacity))
     }
 
+    /// Returns the inner [`RtMap`].
+    pub fn into_inner(self) -> RtMap<TypeId, Box<dyn Resource>> {
+        self.0
+    }
+
     /// Returns the number of elements the map can hold without reallocating.
     ///
     /// This number is a lower bound; the `Resources<K, V>` might be able to
@@ -363,6 +368,16 @@ mod tests {
     fn with_capacity_reserves_enough_capacity() {
         let map = Resources::with_capacity(100);
         assert!(map.capacity() >= 100);
+    }
+
+    #[test]
+    fn into_inner() {
+        let mut resources = Resources::default();
+        resources.insert(Res);
+
+        let rt_map = resources.into_inner();
+
+        assert!(rt_map.contains_key(&TypeId::of::<Res>()));
     }
 
     #[test]
