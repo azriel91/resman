@@ -214,7 +214,8 @@
 //! [`FnMeta`]: fn_meta::FnMeta
 
 pub use crate::{
-    entry::Entry, r#ref::Ref, ref_mut::RefMut, resource::Resource, resources::Resources,
+    entry::Entry, r#ref::Ref, ref_mut::RefMut, resource::Resource,
+    resource_fetch_error::ResourceFetchError, resources::Resources,
 };
 
 pub use rt_map::BorrowFail;
@@ -226,6 +227,7 @@ mod entry;
 mod r#ref;
 mod ref_mut;
 mod resource;
+mod resource_fetch_error;
 mod resources;
 
 #[cfg(feature = "fn_res")]

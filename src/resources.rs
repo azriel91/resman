@@ -6,7 +6,7 @@ use std::{
 
 use rt_map::{BorrowFail, Cell, RtMap};
 
-use crate::{Entry, Ref, RefMut, Resource};
+use crate::{Entry, Ref, RefMut, Resource, ResourceFetchError};
 
 /// Map from `TypeId` to type.
 #[derive(Default)]
@@ -125,7 +125,26 @@ impl Resources {
     /// this resource still exists. Thus, only use this if you're sure no
     /// system will try to access this resource after you removed it (or else
     /// you will get a panic).
-    pub fn remove<R>(&mut self) -> Option<R>
+    ///
+    /// # Panics
+    ///
+    /// Panics if the resource doesn't exist in this container.
+    pub fn remove<R>(&mut self) -> R
+    where
+        R: Resource,
+    {
+        self.try_remove::<R>().unwrap()
+    }
+
+    /// Removes a resource of type `R` from this container and returns its
+    /// ownership to the caller. In case there is no such resource in this,
+    /// container, `None` will be returned.
+    ///
+    /// Use this method with caution; other functions and systems might assume
+    /// this resource still exists. Thus, only use this if you're sure no
+    /// system will try to access this resource after you removed it (or else
+    /// you will get a panic).
+    pub fn try_remove<R>(&mut self) -> Result<R, ResourceFetchError>
     where
         R: Resource,
     {
@@ -134,6 +153,7 @@ impl Resources {
             .map(|x: Box<dyn Resource>| x.downcast())
             .map(|x: Result<Box<R>, _>| x.ok().unwrap())
             .map(|x| *x)
+            .ok_or_else(ResourceFetchError::new::<R>)
     }
 
     /// Returns true if the specified resource type `R` exists in `self`.
@@ -278,7 +298,7 @@ mod tests {
     use std::any::TypeId;
 
     use super::Resources;
-    use crate::BorrowFail;
+    use crate::{BorrowFail, ResourceFetchError};
 
     #[test]
     fn entry_or_insert_inserts_value() {
@@ -412,13 +432,31 @@ mod tests {
 
         assert!(resources.contains::<Res>());
 
-        resources.remove::<Res>().unwrap();
+        resources.remove::<Res>();
 
         assert!(!resources.contains::<Res>());
 
         resources.insert(Res);
 
         assert!(resources.contains::<Res>());
+    }
+
+    #[test]
+    fn try_remove() {
+        let mut resources = Resources::default();
+        resources.insert(Res);
+
+        assert!(resources.contains::<Res>());
+
+        assert_eq!(Ok(Res), resources.try_remove::<Res>());
+        assert!(matches!(
+            resources.try_remove::<Res>(),
+            Err(ResourceFetchError {
+                resource_name_short,
+                resource_name_full,
+            }) if resource_name_short == "Res"
+            && resource_name_full == "resman::resources::tests::Res"
+        ));
     }
 
     #[test]
