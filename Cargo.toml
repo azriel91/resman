@@ -1,6 +1,6 @@
 [package]
 name = "resman"
-version = "0.16.1"
+version = "0.17.0"
 authors = ["Azriel Hoh <azriel91@gmail.com>"]
 edition = "2021"
 description = "Runtime managed resource borrowing."
@@ -17,6 +17,7 @@ features = ["debug", "fn_res", "fn_meta"]
 downcast-rs = "1.2.0"
 fn_meta = { version = "0.7.3", optional = true, features = ["fn_meta_ext"] }
 rt_map = "0.5.2"
+tynm = "0.1.8"
 
 [features]
 default = []

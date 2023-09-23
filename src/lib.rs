@@ -24,14 +24,14 @@
 //! resman = "0.16.0"
 //!
 //! # or
-//! resman = { version = "0.16.1", features = ["debug"] }
-//! resman = { version = "0.16.1", features = ["fn_res"] }
-//! resman = { version = "0.16.1", features = ["fn_res", "fn_res_mut"] }
-//! resman = { version = "0.16.1", features = ["fn_res", "fn_meta"] }
-//! resman = { version = "0.16.1", features = ["fn_res", "fn_res_mut", "fn_meta"] }
+//! resman = { version = "0.17.0", features = ["debug"] }
+//! resman = { version = "0.17.0", features = ["fn_res"] }
+//! resman = { version = "0.17.0", features = ["fn_res", "fn_res_mut"] }
+//! resman = { version = "0.17.0", features = ["fn_res", "fn_meta"] }
+//! resman = { version = "0.17.0", features = ["fn_res", "fn_res_mut", "fn_meta"] }
 //!
 //! # requires nightly
-//! resman = { version = "0.16.1", features = ["fn_res", "fn_res_mut", "fn_res_once"] }
+//! resman = { version = "0.17.0", features = ["fn_res", "fn_res_mut", "fn_res_once"] }
 //! ```
 //!
 //! In code:
@@ -214,7 +214,8 @@
 //! [`FnMeta`]: fn_meta::FnMeta
 
 pub use crate::{
-    entry::Entry, r#ref::Ref, ref_mut::RefMut, resource::Resource, resources::Resources,
+    entry::Entry, r#ref::Ref, ref_mut::RefMut, resource::Resource,
+    resource_fetch_error::ResourceFetchError, resources::Resources,
 };
 
 pub use rt_map::BorrowFail;
@@ -226,6 +227,7 @@ mod entry;
 mod r#ref;
 mod ref_mut;
 mod resource;
+mod resource_fetch_error;
 mod resources;
 
 #[cfg(feature = "fn_res")]
