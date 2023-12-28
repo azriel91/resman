@@ -2,13 +2,13 @@ use std::any::{Any, TypeId};
 
 use downcast_rs::DowncastSync;
 
-/// Trait to represent any type that is `Send + Sync + 'static`.
+/// Trait to represent any type that is `Send + Sync`.
 ///
 /// A resource is a data slot which lives in the `World` can only be accessed
 /// according to Rust's typical borrowing model (one writer xor multiple
 /// readers).
 #[cfg(not(feature = "debug"))]
-pub trait Resource: DowncastSync + 'static {
+pub trait Resource: DowncastSync {
     fn type_id(&self) -> TypeId;
     fn type_name(&self) -> TypeNameLit;
 }
@@ -27,13 +27,13 @@ where
     }
 }
 
-/// Trait to represent any type that is `Send + Sync + 'static`.
+/// Trait to represent any type that is `Send + Sync`.
 ///
 /// A resource is a data slot which lives in the `World` can only be accessed
 /// according to Rust's typical borrowing model (one writer xor multiple
 /// readers).
 #[cfg(feature = "debug")]
-pub trait Resource: DowncastSync + std::fmt::Debug + 'static {
+pub trait Resource: DowncastSync + std::fmt::Debug {
     fn type_id(&self) -> TypeId;
     fn type_name(&self) -> TypeNameLit;
 }

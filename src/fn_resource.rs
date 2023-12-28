@@ -15,8 +15,7 @@ pub struct FnResource<Fun, Ret, Args> {
 #[cfg(feature = "fn_res_once")]
 impl<Fun, Ret> FnResource<Fun, Ret, ()>
 where
-    Fun: FnOnce() -> Ret + 'static,
-    Ret: 'static,
+    Fun: FnOnce() -> Ret,
 {
     pub fn call_once(self, _resources: &Resources) -> Ret {
         (self.func)()
@@ -31,8 +30,7 @@ where
 #[cfg(feature = "fn_res_mut")]
 impl<Fun, Ret> FnResource<Fun, Ret, ()>
 where
-    Fun: FnMut() -> Ret + 'static,
-    Ret: 'static,
+    Fun: FnMut() -> Ret,
 {
     pub fn call_mut(&mut self, _resources: &Resources) -> Ret {
         (self.func)()
@@ -46,8 +44,7 @@ where
 
 impl<Fun, Ret> FnResource<Fun, Ret, ()>
 where
-    Fun: Fn() -> Ret + 'static,
-    Ret: 'static,
+    Fun: Fn() -> Ret,
 {
     pub fn call(&self, _resources: &Resources) -> Ret {
         (self.func)()
@@ -62,8 +59,7 @@ where
 #[cfg(feature = "fn_meta")]
 impl<Fun, Ret> fn_meta::FnMeta for FnResource<Fun, Ret, ()>
 where
-    Fun: FnOnce() -> Ret + 'static,
-    Ret: 'static,
+    Fun: FnOnce() -> Ret,
 {
     fn borrows() -> fn_meta::TypeIds {
         <fn_meta::FnMetadata<Fun, Ret, ()> as fn_meta::FnMeta>::borrows()
@@ -77,8 +73,7 @@ where
 #[cfg(feature = "fn_meta")]
 impl<Fun, Ret> fn_meta::FnMetaDyn for FnResource<Fun, Ret, ()>
 where
-    Fun: FnOnce() -> Ret + 'static,
-    Ret: 'static,
+    Fun: FnOnce() -> Ret,
 {
     fn borrows(&self) -> fn_meta::TypeIds {
         fn_meta::FnMetaExt::meta(&self.func).borrows()
@@ -97,8 +92,7 @@ pub trait IntoFnResource<Fun, Ret, Args> {
 
 impl<Fun, Ret> IntoFnResource<Fun, Ret, ()> for Fun
 where
-    Fun: FnOnce() -> Ret + 'static,
-    Ret: 'static,
+    Fun: FnOnce() -> Ret,
 {
     fn into_fn_resource(self) -> FnResource<Fun, Ret, ()> {
         FnResource {
@@ -110,8 +104,7 @@ where
 
 impl<Fun, Ret, A> IntoFnResource<Fun, Ret, (A,)> for Fun
 where
-    Fun: FnOnce(A) -> Ret + 'static,
-    Ret: 'static,
+    Fun: FnOnce(A) -> Ret,
 {
     fn into_fn_resource(self) -> FnResource<Fun, Ret, (A,)> {
         FnResource {
@@ -123,8 +116,7 @@ where
 
 impl<Fun, Ret, A, B> IntoFnResource<Fun, Ret, (A, B)> for Fun
 where
-    Fun: FnOnce(A, B) -> Ret + 'static,
-    Ret: 'static,
+    Fun: FnOnce(A, B) -> Ret,
 {
     fn into_fn_resource(self) -> FnResource<Fun, Ret, (A, B)> {
         FnResource {
@@ -136,8 +128,7 @@ where
 
 impl<Fun, Ret, A, B, C> IntoFnResource<Fun, Ret, (A, B, C)> for Fun
 where
-    Fun: FnOnce(A, B, C) -> Ret + 'static,
-    Ret: 'static,
+    Fun: FnOnce(A, B, C) -> Ret,
 {
     fn into_fn_resource(self) -> FnResource<Fun, Ret, (A, B, C)> {
         FnResource {
@@ -149,8 +140,7 @@ where
 
 impl<Fun, Ret, A, B, C, D> IntoFnResource<Fun, Ret, (A, B, C, D)> for Fun
 where
-    Fun: FnOnce(A, B, C, D) -> Ret + 'static,
-    Ret: 'static,
+    Fun: FnOnce(A, B, C, D) -> Ret,
 {
     fn into_fn_resource(self) -> FnResource<Fun, Ret, (A, B, C, D)> {
         FnResource {
@@ -162,8 +152,7 @@ where
 
 impl<Fun, Ret, A, B, C, D, E> IntoFnResource<Fun, Ret, (A, B, C, D, E)> for Fun
 where
-    Fun: FnOnce(A, B, C, D, E) -> Ret + 'static,
-    Ret: 'static,
+    Fun: FnOnce(A, B, C, D, E) -> Ret,
 {
     fn into_fn_resource(self) -> FnResource<Fun, Ret, (A, B, C, D, E)> {
         FnResource {
@@ -175,8 +164,7 @@ where
 
 impl<Fun, Ret, A, B, C, D, E, F> IntoFnResource<Fun, Ret, (A, B, C, D, E, F)> for Fun
 where
-    Fun: FnOnce(A, B, C, D, E, F) -> Ret + 'static,
-    Ret: 'static,
+    Fun: FnOnce(A, B, C, D, E, F) -> Ret,
 {
     fn into_fn_resource(self) -> FnResource<Fun, Ret, (A, B, C, D, E, F)> {
         FnResource {
@@ -189,8 +177,7 @@ where
 #[cfg(feature = "high_arg_count")]
 impl<Fun, Ret, A, B, C, D, E, F, G> IntoFnResource<Fun, Ret, (A, B, C, D, E, F, G)> for Fun
 where
-    Fun: FnOnce(A, B, C, D, E, F, G) -> Ret + 'static,
-    Ret: 'static,
+    Fun: FnOnce(A, B, C, D, E, F, G) -> Ret,
 {
     #[allow(clippy::type_complexity)]
     fn into_fn_resource(self) -> FnResource<Fun, Ret, (A, B, C, D, E, F, G)> {
@@ -204,8 +191,7 @@ where
 #[cfg(feature = "high_arg_count")]
 impl<Fun, Ret, A, B, C, D, E, F, G, H> IntoFnResource<Fun, Ret, (A, B, C, D, E, F, G, H)> for Fun
 where
-    Fun: FnOnce(A, B, C, D, E, F, G, H) -> Ret + 'static,
-    Ret: 'static,
+    Fun: FnOnce(A, B, C, D, E, F, G, H) -> Ret,
 {
     #[allow(clippy::type_complexity)]
     fn into_fn_resource(self) -> FnResource<Fun, Ret, (A, B, C, D, E, F, G, H)> {

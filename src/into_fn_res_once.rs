@@ -8,8 +8,7 @@ pub trait IntoFnResOnce<Fun, Ret, Args> {
 
 impl<Fun, Ret> IntoFnResOnce<Fun, Ret, ()> for Fun
 where
-    Fun: FnOnce() -> Ret + 'static,
-    Ret: 'static,
+    Fun: FnOnce() -> Ret,
     FnResource<Fun, Ret, ()>: FnResOnce<Ret = Ret>,
 {
     fn into_fn_res_once(self) -> Box<dyn FnResOnce<Ret = Ret>> {
@@ -19,9 +18,7 @@ where
 
 impl<Fun, Ret, A> IntoFnResOnce<Fun, Ret, (A,)> for Fun
 where
-    Fun: FnOnce(A) -> Ret + 'static,
-    Ret: 'static,
-    A: 'static,
+    Fun: FnOnce(A) -> Ret,
     FnResource<Fun, Ret, (A,)>: FnResOnce<Ret = Ret>,
 {
     fn into_fn_res_once(self) -> Box<dyn FnResOnce<Ret = Ret>> {
@@ -31,10 +28,7 @@ where
 
 impl<Fun, Ret, A, B> IntoFnResOnce<Fun, Ret, (A, B)> for Fun
 where
-    Fun: FnOnce(A, B) -> Ret + 'static,
-    Ret: 'static,
-    A: 'static,
-    B: 'static,
+    Fun: FnOnce(A, B) -> Ret,
     FnResource<Fun, Ret, (A, B)>: FnResOnce<Ret = Ret>,
 {
     fn into_fn_res_once(self) -> Box<dyn FnResOnce<Ret = Ret>> {
@@ -44,11 +38,7 @@ where
 
 impl<Fun, Ret, A, B, C> IntoFnResOnce<Fun, Ret, (A, B, C)> for Fun
 where
-    Fun: FnOnce(A, B, C) -> Ret + 'static,
-    Ret: 'static,
-    A: 'static,
-    B: 'static,
-    C: 'static,
+    Fun: FnOnce(A, B, C) -> Ret,
     FnResource<Fun, Ret, (A, B, C)>: FnResOnce<Ret = Ret>,
 {
     fn into_fn_res_once(self) -> Box<dyn FnResOnce<Ret = Ret>> {
@@ -58,12 +48,7 @@ where
 
 impl<Fun, Ret, A, B, C, D> IntoFnResOnce<Fun, Ret, (A, B, C, D)> for Fun
 where
-    Fun: FnOnce(A, B, C, D) -> Ret + 'static,
-    Ret: 'static,
-    A: 'static,
-    B: 'static,
-    C: 'static,
-    D: 'static,
+    Fun: FnOnce(A, B, C, D) -> Ret,
     FnResource<Fun, Ret, (A, B, C, D)>: FnResOnce<Ret = Ret>,
 {
     fn into_fn_res_once(self) -> Box<dyn FnResOnce<Ret = Ret>> {
@@ -73,13 +58,7 @@ where
 
 impl<Fun, Ret, A, B, C, D, E> IntoFnResOnce<Fun, Ret, (A, B, C, D, E)> for Fun
 where
-    Fun: FnOnce(A, B, C, D, E) -> Ret + 'static,
-    Ret: 'static,
-    A: 'static,
-    B: 'static,
-    C: 'static,
-    D: 'static,
-    E: 'static,
+    Fun: FnOnce(A, B, C, D, E) -> Ret,
     FnResource<Fun, Ret, (A, B, C, D, E)>: FnResOnce<Ret = Ret>,
 {
     fn into_fn_res_once(self) -> Box<dyn FnResOnce<Ret = Ret>> {
@@ -89,14 +68,7 @@ where
 
 impl<Fun, Ret, A, B, C, D, E, F> IntoFnResOnce<Fun, Ret, (A, B, C, D, E, F)> for Fun
 where
-    Fun: FnOnce(A, B, C, D, E, F) -> Ret + 'static,
-    Ret: 'static,
-    A: 'static,
-    B: 'static,
-    C: 'static,
-    D: 'static,
-    E: 'static,
-    F: 'static,
+    Fun: FnOnce(A, B, C, D, E, F) -> Ret,
     FnResource<Fun, Ret, (A, B, C, D, E, F)>: FnResOnce<Ret = Ret>,
 {
     fn into_fn_res_once(self) -> Box<dyn FnResOnce<Ret = Ret>> {
@@ -107,15 +79,7 @@ where
 #[cfg(feature = "high_arg_count")]
 impl<Fun, Ret, A, B, C, D, E, F, G> IntoFnResOnce<Fun, Ret, (A, B, C, D, E, F, G)> for Fun
 where
-    Fun: FnOnce(A, B, C, D, E, F, G) -> Ret + 'static,
-    Ret: 'static,
-    A: 'static,
-    B: 'static,
-    C: 'static,
-    D: 'static,
-    E: 'static,
-    F: 'static,
-    G: 'static,
+    Fun: FnOnce(A, B, C, D, E, F, G) -> Ret,
     FnResource<Fun, Ret, (A, B, C, D, E, F, G)>: FnResOnce<Ret = Ret>,
 {
     fn into_fn_res_once(self) -> Box<dyn FnResOnce<Ret = Ret>> {
@@ -126,16 +90,7 @@ where
 #[cfg(feature = "high_arg_count")]
 impl<Fun, Ret, A, B, C, D, E, F, G, H> IntoFnResOnce<Fun, Ret, (A, B, C, D, E, F, G, H)> for Fun
 where
-    Fun: FnOnce(A, B, C, D, E, F, G, H) -> Ret + 'static,
-    Ret: 'static,
-    A: 'static,
-    B: 'static,
-    C: 'static,
-    D: 'static,
-    E: 'static,
-    F: 'static,
-    G: 'static,
-    H: 'static,
+    Fun: FnOnce(A, B, C, D, E, F, G, H) -> Ret,
     FnResource<Fun, Ret, (A, B, C, D, E, F, G, H)>: FnResOnce<Ret = Ret>,
 {
     fn into_fn_res_once(self) -> Box<dyn FnResOnce<Ret = Ret>> {
