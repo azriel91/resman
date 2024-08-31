@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.17.1 (2024-08-31)
+
+* Update dependency versions.
+
+
 ## 0.17.0 (2023-09-23)
 
 * ***Breaking:*** Change `Resources::remove::<R>` to return `R`. ([#13])
