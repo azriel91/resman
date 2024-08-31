@@ -91,6 +91,7 @@ mod common {
         let fn_resource_impl_path = out_dir.join(file_name);
         let fn_resource_impl = OpenOptions::new()
             .create(true)
+            .truncate(true)
             .write(true)
             .open(fn_resource_impl_path)
             .unwrap_or_else(|e| panic!("Failed to open `{file_name}`. Error: {e}"));
