@@ -1,6 +1,6 @@
 [package]
 name = "resman"
-version = "0.17.1"
+version = "0.17.2"
 authors = ["Azriel Hoh <azriel91@gmail.com>"]
 edition = "2021"
 description = "Runtime managed resource borrowing."

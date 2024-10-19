@@ -1,6 +1,6 @@
 # Changelog
 
-## unreleased
+## 0.17.2 (2024-10-19)
 
 * Add `Resources::merge`. ([#14])
 
