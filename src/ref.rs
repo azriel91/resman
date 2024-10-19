@@ -18,7 +18,7 @@ impl<'a, R> Ref<'a, R> {
     }
 }
 
-impl<'a, R> Deref for Ref<'a, R>
+impl<R> Deref for Ref<'_, R>
 where
     R: Resource,
 {

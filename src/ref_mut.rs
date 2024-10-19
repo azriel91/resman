@@ -43,7 +43,7 @@ impl<'a, R> RefMut<'a, R> {
     }
 }
 
-impl<'a, R> Deref for RefMut<'a, R>
+impl<R> Deref for RefMut<'_, R>
 where
     R: Resource,
 {
@@ -56,7 +56,7 @@ where
     }
 }
 
-impl<'a, R> DerefMut for RefMut<'a, R>
+impl<R> DerefMut for RefMut<'_, R>
 where
     R: Resource,
 {

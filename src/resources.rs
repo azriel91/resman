@@ -252,7 +252,7 @@ impl Resources {
 
     /// Merges the other `Resources` map over this one.
     pub fn merge(&mut self, other: Resources) {
-        self.0.extend(other.into_inner().into_inner().into_iter())
+        self.0.extend(other.into_inner().into_inner())
     }
 }
 
