@@ -1,5 +1,12 @@
 # Changelog
 
+## 0.17.2 (2024-10-19)
+
+* Add `Resources::merge`. ([#14])
+
+[#14]: https://github.com/azriel91/resman/pull/14
+
+
 ## 0.17.1 (2024-08-31)
 
 * Update dependency versions.
@@ -11,7 +18,7 @@
 * Add `Resources::try_remove::<R>` to return `Result<R, ResourceFetchError>`. ([#13])
 * Add `Resources::into_inner()`. ([#13])
 
- [#13]: https://github.com/azriel91/resman/pull/13
+[#13]: https://github.com/azriel91/resman/pull/13
 
 
 ## 0.16.1 (2023-04-06)

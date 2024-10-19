@@ -249,6 +249,11 @@ impl Resources {
             ),
         }
     }
+
+    /// Merges the other `Resources` map over this one.
+    pub fn merge(&mut self, other: Resources) {
+        self.0.extend(other.into_inner().into_inner())
+    }
 }
 
 #[cfg(not(feature = "debug"))]
@@ -557,6 +562,22 @@ mod tests {
         resources.insert(Res);
 
         assert!(resources.get_raw(&TypeId::of::<Res>()).is_some());
+    }
+
+    #[test]
+    fn merge() {
+        let mut resources_0 = Resources::default();
+        resources_0.insert(1u8);
+        resources_0.insert(2u16);
+
+        let mut resources_1 = Resources::default();
+        resources_1.insert(3u8);
+        resources_1.insert(4u32);
+
+        resources_0.merge(resources_1);
+
+        assert_eq!(3u8, *resources_0.borrow::<u8>());
+        assert_eq!(4u32, *resources_0.borrow::<u32>());
     }
 
     #[derive(Debug, Default, PartialEq)]
