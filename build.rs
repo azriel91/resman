@@ -248,20 +248,20 @@ mod common {
     fn arg_bounds_list<const N: usize>() -> String {
         let mut arg_bounds_list = String::with_capacity(N * 50);
         #[cfg(feature = "debug")]
-        arg_bounds_list.push_str("    A0: std::fmt::Debug + Send + Sync + 'static,");
+        arg_bounds_list.push_str("    A0: std::fmt::Debug + Send + Sync,");
 
         #[cfg(not(feature = "debug"))]
-        arg_bounds_list.push_str("    A0: Send + Sync + 'static,");
+        arg_bounds_list.push_str("    A0: Send + Sync,");
         (1..N).fold(arg_bounds_list, |mut arg_bounds_list, n| {
             #[cfg(feature = "debug")]
             write!(
                 &mut arg_bounds_list,
-                "\n    A{n}: std::fmt::Debug + Send + Sync + 'static,"
+                "\n    A{n}: std::fmt::Debug + Send + Sync,"
             )
             .expect("Failed to append to args_csv string.");
 
             #[cfg(not(feature = "debug"))]
-            write!(&mut arg_bounds_list, "\n    A{n}: Send + Sync + 'static,")
+            write!(&mut arg_bounds_list, "\n    A{n}: Send + Sync,")
                 .expect("Failed to append to args_csv string.");
             arg_bounds_list
         })
@@ -302,9 +302,8 @@ mod fn_resource_impl {
             r#"
 impl<Fun, Ret, {args_csv}> FnResource<Fun, Ret, ({arg_refs_csv})>
 where
-    Fun: FnOnce({arg_refs_csv}) -> Ret + 'static,
-    Ret: 'static,
-    {arg_bounds_list}
+    Fun: FnOnce({arg_refs_csv}) -> Ret,
+        {arg_bounds_list}
 {{
     pub fn call_once(self, resources: &Resources) -> Ret {{
         {resource_arg_borrows}
@@ -329,9 +328,8 @@ where
             r#"
 impl<Fun, Ret, {args_csv}> FnResource<Fun, Ret, ({arg_refs_csv})>
 where
-    Fun: FnMut({arg_refs_csv}) -> Ret + 'static,
-    Ret: 'static,
-    {arg_bounds_list}
+    Fun: FnMut({arg_refs_csv}) -> Ret,
+        {arg_bounds_list}
 {{
     pub fn call_mut(&mut self, resources: &Resources) -> Ret {{
         {resource_arg_borrows}
@@ -355,9 +353,8 @@ where
             r#"
 impl<Fun, Ret, {args_csv}> FnResource<Fun, Ret, ({arg_refs_csv})>
 where
-    Fun: Fn({arg_refs_csv}) -> Ret + 'static,
-    Ret: 'static,
-    {arg_bounds_list}
+    Fun: Fn({arg_refs_csv}) -> Ret,
+        {arg_bounds_list}
 {{
     pub fn call(&self, resources: &Resources) -> Ret {{
         {resource_arg_borrows}
@@ -400,9 +397,8 @@ mod fn_res_once_impl {
             r#"
 impl<Fun, Ret, {args_csv}> FnResOnce for FnResource<Fun, Ret, ({arg_refs_csv})>
 where
-    Fun: FnOnce({arg_refs_csv}) -> Ret + 'static,
-    Ret: 'static,
-    {arg_bounds_list}
+    Fun: FnOnce({arg_refs_csv}) -> Ret,
+        {arg_bounds_list}
 {{
     type Ret = Ret;
 
@@ -447,9 +443,8 @@ mod fn_res_mut_impl {
             r#"
 impl<Fun, Ret, {args_csv}> FnResMut for FnResource<Fun, Ret, ({arg_refs_csv})>
 where
-    Fun: FnMut({arg_refs_csv}) -> Ret + 'static,
-    Ret: 'static,
-    {arg_bounds_list}
+    Fun: FnMut({arg_refs_csv}) -> Ret,
+        {arg_bounds_list}
 {{
 {ret_type_str}
     fn call_mut(&mut self, resources: &Resources) -> Ret {{
@@ -493,9 +488,8 @@ mod fn_res_impl {
             r#"
 impl<Fun, Ret, {args_csv}> FnRes for FnResource<Fun, Ret, ({arg_refs_csv})>
 where
-    Fun: Fn({arg_refs_csv}) -> Ret + 'static,
-    Ret: 'static,
-    {arg_bounds_list}
+    Fun: Fn({arg_refs_csv}) -> Ret,
+        {arg_bounds_list}
 {{
 {ret_type_str}
     fn call(&self, resources: &Resources) -> Ret {{
@@ -539,9 +533,8 @@ mod fn_resource_meta_impl {
             r#"
 impl<Fun, Ret, {args_csv}> fn_meta::FnMeta for FnResource<Fun, Ret, ({arg_refs_csv})>
 where
-    Fun: FnOnce({arg_refs_csv}) -> Ret + 'static,
-    Ret: 'static,
-    {arg_bounds_list}
+    Fun: FnOnce({arg_refs_csv}) -> Ret,
+        {arg_bounds_list}
 {{
     fn borrows() -> fn_meta::TypeIds {{
         <fn_meta::FnMetadata<Fun, Ret, ({arg_refs_csv})> as fn_meta::FnMeta>::borrows()
@@ -554,9 +547,8 @@ where
 
 impl<Fun, Ret, {args_csv}> fn_meta::FnMetaDyn for FnResource<Fun, Ret, ({arg_refs_csv})>
 where
-    Fun: FnOnce({arg_refs_csv}) -> Ret + 'static,
-    Ret: 'static,
-    {arg_bounds_list}
+    Fun: FnOnce({arg_refs_csv}) -> Ret,
+        {arg_bounds_list}
 {{
     fn borrows(&self) -> fn_meta::TypeIds {{
         fn_meta::FnMetaExt::meta(&self.func).borrows()

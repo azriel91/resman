@@ -8,8 +8,7 @@ pub trait IntoFnResMut<Fun, Ret, Args> {
 
 impl<Fun, Ret> IntoFnResMut<Fun, Ret, ()> for Fun
 where
-    Fun: FnMut() -> Ret + 'static,
-    Ret: 'static,
+    Fun: FnMut() -> Ret,
     FnResource<Fun, Ret, ()>: FnResMut<Ret = Ret>,
 {
     fn into_fn_res_mut(self) -> Box<dyn FnResMut<Ret = Ret>> {
@@ -19,9 +18,8 @@ where
 
 impl<Fun, Ret, A> IntoFnResMut<Fun, Ret, (A,)> for Fun
 where
-    Fun: FnMut(A) -> Ret + 'static,
-    Ret: 'static,
-    A: 'static,
+    Fun: FnMut(A) -> Ret,
+
     FnResource<Fun, Ret, (A,)>: FnResMut<Ret = Ret>,
 {
     fn into_fn_res_mut(self) -> Box<dyn FnResMut<Ret = Ret>> {
@@ -31,10 +29,8 @@ where
 
 impl<Fun, Ret, A, B> IntoFnResMut<Fun, Ret, (A, B)> for Fun
 where
-    Fun: FnMut(A, B) -> Ret + 'static,
-    Ret: 'static,
-    A: 'static,
-    B: 'static,
+    Fun: FnMut(A, B) -> Ret,
+
     FnResource<Fun, Ret, (A, B)>: FnResMut<Ret = Ret>,
 {
     fn into_fn_res_mut(self) -> Box<dyn FnResMut<Ret = Ret>> {
@@ -44,11 +40,8 @@ where
 
 impl<Fun, Ret, A, B, C> IntoFnResMut<Fun, Ret, (A, B, C)> for Fun
 where
-    Fun: FnMut(A, B, C) -> Ret + 'static,
-    Ret: 'static,
-    A: 'static,
-    B: 'static,
-    C: 'static,
+    Fun: FnMut(A, B, C) -> Ret,
+
     FnResource<Fun, Ret, (A, B, C)>: FnResMut<Ret = Ret>,
 {
     fn into_fn_res_mut(self) -> Box<dyn FnResMut<Ret = Ret>> {
@@ -58,12 +51,8 @@ where
 
 impl<Fun, Ret, A, B, C, D> IntoFnResMut<Fun, Ret, (A, B, C, D)> for Fun
 where
-    Fun: FnMut(A, B, C, D) -> Ret + 'static,
-    Ret: 'static,
-    A: 'static,
-    B: 'static,
-    C: 'static,
-    D: 'static,
+    Fun: FnMut(A, B, C, D) -> Ret,
+
     FnResource<Fun, Ret, (A, B, C, D)>: FnResMut<Ret = Ret>,
 {
     fn into_fn_res_mut(self) -> Box<dyn FnResMut<Ret = Ret>> {
@@ -73,13 +62,7 @@ where
 
 impl<Fun, Ret, A, B, C, D, E> IntoFnResMut<Fun, Ret, (A, B, C, D, E)> for Fun
 where
-    Fun: FnMut(A, B, C, D, E) -> Ret + 'static,
-    Ret: 'static,
-    A: 'static,
-    B: 'static,
-    C: 'static,
-    D: 'static,
-    E: 'static,
+    Fun: FnMut(A, B, C, D, E) -> Ret,
     FnResource<Fun, Ret, (A, B, C, D, E)>: FnResMut<Ret = Ret>,
 {
     fn into_fn_res_mut(self) -> Box<dyn FnResMut<Ret = Ret>> {
@@ -89,14 +72,8 @@ where
 
 impl<Fun, Ret, A, B, C, D, E, F> IntoFnResMut<Fun, Ret, (A, B, C, D, E, F)> for Fun
 where
-    Fun: FnMut(A, B, C, D, E, F) -> Ret + 'static,
-    Ret: 'static,
-    A: 'static,
-    B: 'static,
-    C: 'static,
-    D: 'static,
-    E: 'static,
-    F: 'static,
+    Fun: FnMut(A, B, C, D, E, F) -> Ret,
+
     FnResource<Fun, Ret, (A, B, C, D, E, F)>: FnResMut<Ret = Ret>,
 {
     fn into_fn_res_mut(self) -> Box<dyn FnResMut<Ret = Ret>> {
@@ -107,15 +84,8 @@ where
 #[cfg(feature = "high_arg_count")]
 impl<Fun, Ret, A, B, C, D, E, F, G> IntoFnResMut<Fun, Ret, (A, B, C, D, E, F, G)> for Fun
 where
-    Fun: FnMut(A, B, C, D, E, F, G) -> Ret + 'static,
-    Ret: 'static,
-    A: 'static,
-    B: 'static,
-    C: 'static,
-    D: 'static,
-    E: 'static,
-    F: 'static,
-    G: 'static,
+    Fun: FnMut(A, B, C, D, E, F, G) -> Ret,
+
     FnResource<Fun, Ret, (A, B, C, D, E, F, G)>: FnResMut<Ret = Ret>,
 {
     fn into_fn_res_mut(self) -> Box<dyn FnResMut<Ret = Ret>> {
@@ -126,16 +96,7 @@ where
 #[cfg(feature = "high_arg_count")]
 impl<Fun, Ret, A, B, C, D, E, F, G, H> IntoFnResMut<Fun, Ret, (A, B, C, D, E, F, G, H)> for Fun
 where
-    Fun: FnMut(A, B, C, D, E, F, G, H) -> Ret + 'static,
-    Ret: 'static,
-    A: 'static,
-    B: 'static,
-    C: 'static,
-    D: 'static,
-    E: 'static,
-    F: 'static,
-    G: 'static,
-    H: 'static,
+    Fun: FnMut(A, B, C, D, E, F, G, H) -> Ret,
     FnResource<Fun, Ret, (A, B, C, D, E, F, G, H)>: FnResMut<Ret = Ret>,
 {
     fn into_fn_res_mut(self) -> Box<dyn FnResMut<Ret = Ret>> {
