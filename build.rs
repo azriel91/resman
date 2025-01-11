@@ -234,7 +234,7 @@ mod common {
                     // m can be 0..32
                     // if 31 >> 5 is 0
 
-                    if m >> n & 1 == 0 {
+                    if (m >> n) & 1 == 0 {
                         *arg_ref = Ref::Immutable;
                     } else {
                         *arg_ref = Ref::Mutable;
