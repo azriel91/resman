@@ -26,7 +26,7 @@ following differences:
 Add the following to `Cargo.toml`
 
 ```toml
-resman = "0.16.0"
+resman = "0.18.0"
 
 # or
 resman = { version = "0.18.0", features = ["debug"] }
