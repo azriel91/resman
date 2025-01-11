@@ -14,7 +14,7 @@ license = "MIT OR Apache-2.0"
 features = ["debug", "fn_res", "fn_meta"]
 
 [dependencies]
-downcast-rs = "1.2.1"
+downcast-rs = "2.0.1"
 fn_meta = { version = "0.7.4", optional = true, features = ["fn_meta_ext"] }
 rt_map = "0.5.4"
 tynm = "0.1.10"
