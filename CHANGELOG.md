@@ -1,5 +1,12 @@
 # Changelog
 
+## unreleased
+
+* Update `downcast-rs` to `2.0.1`  ([#15])
+
+[#15]: https://github.com/azriel91/resman/pull/15
+
+
 ## 0.17.2 (2024-10-19)
 
 * Add `Resources::merge`. ([#14])
