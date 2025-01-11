@@ -1,6 +1,6 @@
 # Changelog
 
-## unreleased
+## 0.18.0 (2025-01-11)
 
 * Update `downcast-rs` to `2.0.1`  ([#15])
 
