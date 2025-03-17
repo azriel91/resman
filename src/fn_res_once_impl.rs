@@ -4,8 +4,7 @@ use crate::{FnResOnce, FnResource, Resources};
 
 impl<Fun, Ret> FnResOnce for FnResource<Fun, Ret, ()>
 where
-    Fun: FnOnce() -> Ret + 'static,
-    Ret: 'static,
+    Fun: FnOnce() -> Ret,
 {
     type Ret = Ret;
 

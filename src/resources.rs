@@ -179,7 +179,7 @@ impl Resources {
     /// Panics if the resource is being accessed mutably.
     ///
     /// [`try_borrow`]: Self::try_borrow
-    pub fn borrow<R>(&self) -> Ref<R>
+    pub fn borrow<'a, R>(&self) -> Ref<'a, R>
     where
         R: Resource,
     {
@@ -188,7 +188,7 @@ impl Resources {
     }
 
     /// Returns an immutable reference to `R` if it exists, `None` otherwise.
-    pub fn try_borrow<R>(&self) -> Result<Ref<R>, BorrowFail>
+    pub fn try_borrow<'a, R>(&self) -> Result<Ref<'a, R>, BorrowFail>
     where
         R: Resource,
     {
@@ -201,7 +201,7 @@ impl Resources {
     ///
     /// Panics if the resource doesn't exist.
     /// Panics if the resource is already accessed.
-    pub fn borrow_mut<R>(&self) -> RefMut<R>
+    pub fn borrow_mut<'a, R>(&self) -> RefMut<'a, R>
     where
         R: Resource,
     {
@@ -210,7 +210,7 @@ impl Resources {
     }
 
     /// Returns a mutable reference to `R` if it exists, `None` otherwise.
-    pub fn try_borrow_mut<R>(&self) -> Result<RefMut<R>, BorrowFail>
+    pub fn try_borrow_mut<'a, R>(&self) -> Result<RefMut<'a, R>, BorrowFail>
     where
         R: Resource,
     {
