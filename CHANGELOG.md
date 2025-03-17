@@ -1,15 +1,23 @@
 # Changelog
 
+## unreleased
+
+* Update crate rust edition to 2024. ([#17][#17])
+* Update dependency versions. ([#17][#17])
+
+[#17]: https://github.com/azriel91/resman/pull/17
+
+
 ## 0.18.0 (2025-01-11)
 
-* Update `downcast-rs` to `2.0.1`  ([#15])
+* Update `downcast-rs` to `2.0.1`. ([#15][#15])
 
 [#15]: https://github.com/azriel91/resman/pull/15
 
 
 ## 0.17.2 (2024-10-19)
 
-* Add `Resources::merge`. ([#14])
+* Add `Resources::merge`. ([#14][#14])
 
 [#14]: https://github.com/azriel91/resman/pull/14
 
@@ -21,31 +29,31 @@
 
 ## 0.17.0 (2023-09-23)
 
-* ***Breaking:*** Change `Resources::remove::<R>` to return `R`. ([#13])
-* Add `Resources::try_remove::<R>` to return `Result<R, ResourceFetchError>`. ([#13])
-* Add `Resources::into_inner()`. ([#13])
+* ***Breaking:*** Change `Resources::remove::<R>` to return `R`. ([#13][#13])
+* Add `Resources::try_remove::<R>` to return `Result<R, ResourceFetchError>`. ([#13][#13])
+* Add `Resources::into_inner()`. ([#13][#13])
 
 [#13]: https://github.com/azriel91/resman/pull/13
 
 
 ## 0.16.1 (2023-04-06)
 
-* Panic when `Resources::insert_raw` is called with mismatching `TypeId` and `Box<T>`. ([#11])
+* Panic when `Resources::insert_raw` is called with mismatching `TypeId` and `Box<T>`. ([#11][#11])
 
 [#11]: https://github.com/azriel91/resman/pull/11
 
 
 ## 0.16.0 (2022-12-26)
 
-* Add `Resources::insert_raw`. ([#9])
-* Add `Resource::type_id`. ([#9])
+* Add `Resources::insert_raw`. ([#9][#9])
+* Add `Resource::type_id`. ([#9][#9])
 
 [#9]: https://github.com/azriel91/resman/pull/9
 
 
 ## 0.15.0 (2022-07-05)
 
-* Derive `Deref` and `DerefMut` for `Resources`. ([#7])
+* Derive `Deref` and `DerefMut` for `Resources`. ([#7][#7])
 
 [#7]: https://github.com/azriel91/resman/pull/7
 
@@ -93,7 +101,7 @@
 
 ## 0.7.0 (2021-10-25)
 
-* Allow dynamic functions invocation through `Box<dyn FnRes>`. ([#3], [#4])
+* Allow dynamic functions invocation through `Box<dyn FnRes>`. ([#3][#3], [#4][#4])
 
 [#3]: https://github.com/azriel91/resman/issues/3
 [#4]: https://github.com/azriel91/resman/pull/4
@@ -101,7 +109,7 @@
 
 ## 0.6.0 (2021-10-16)
 
-* `Resources` debug impl prints out type names instead of type ID. ([#1], [#2])
+* `Resources` debug impl prints out type names instead of type ID. ([#1][#1], [#2][#2])
 
 [#1]: https://github.com/azriel91/resman/issues/1
 [#2]: https://github.com/azriel91/resman/pull/2
@@ -126,7 +134,7 @@
 
 * Use [`rt_map`] to back `Resources` map.
 
-[`rt_map`]: https://github.com/azriel91/rt_map
+: https://github.com/azriel91/rt_map
 
 
 ## 0.1.0 (2021-04-11)
