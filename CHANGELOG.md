@@ -1,6 +1,6 @@
 # Changelog
 
-## unreleased
+## 0.19.0 (2025-03-17)
 
 * Update crate rust edition to 2024. ([#17][#17])
 * Update dependency versions. ([#17][#17])
@@ -134,7 +134,7 @@
 
 * Use [`rt_map`] to back `Resources` map.
 
-: https://github.com/azriel91/rt_map
+[`rt_map`]: https://github.com/azriel91/rt_map
 
 
 ## 0.1.0 (2021-04-11)
